@@ -1,0 +1,31 @@
+{
+  "name": "smart-health-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "env-cmd": "^10.1.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.5.5",
+    "mongoose": "^5.9.7",
+    "nodemon": "^2.0.3",
+    "validator": "^13.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "env-cmd -f src/.env nodemon src/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Karthika-Arumugam/smartHealth.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Karthika-Arumugam/smartHealth/issues"
+  },
+  "homepage": "https://github.com/Karthika-Arumugam/smartHealth#readme"
+}

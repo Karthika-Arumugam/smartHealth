@@ -47,7 +47,7 @@ router.post("/logout", auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
-    res.status(500).send(error);
+    res.status(400).send(error);
   }
 });
 
@@ -58,7 +58,7 @@ router.post("/me/logoutall", auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
-    res.status(500).send(error);
+    res.status(400).send(error);
   }
 });
 
@@ -73,7 +73,7 @@ router.get('/profile', auth, async (req, res) => {
     
 
   } catch (error) {
-    res.status(500).send(error);
+    res.status(400).send(error);
   }
 });
 
@@ -88,7 +88,37 @@ router.post("/profile", auth, async (req, res) => {
 
 
   } catch (error) {
-    res.status(500).send(error);
+    res.status(400).send(error);
+  }
+});
+
+router.post("/activateDevice", auth, async (req, res) => {
+  // update user profile
+  try {
+
+    user = await User.activateDevice(req.body.emailId);
+
+    if(user)
+      res.json({"deviceStatus" : true});
+    else
+      res.json({"deviceStatus" : false});
+  } catch (error) {
+    res.status(400).send(JSON.stringify(error));
+  }
+});
+
+router.post("/deactivateDevice", auth, async (req, res) => {
+  // update user profile
+  try {
+
+    user = await User.activateDevice(req.body.emailId);
+
+    if(user)
+      res.json({"deviceStatus" : false});
+    else
+      res.json({"deviceStatus" : true});
+  } catch (error) {
+    res.status(400).send(JSON.stringify(error));
   }
 });
 

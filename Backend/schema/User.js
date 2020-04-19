@@ -84,6 +84,11 @@ const userSchema = mongoose.Schema({
 
   },
 
+  deviceStatus : {
+    type : Boolean,
+    required : false
+  },
+
   tokens: [
     {
       token: {
@@ -144,6 +149,49 @@ userSchema.statics.updateProfile = async (req) => {
 
   // return user;
 };
+
+userSchema.statics.activateDevice = async (emailId) => {
+
+    const result =  await User.findOne({'emailId' : emailId });
+
+    if(!result)
+      throw new Error({ error: "Invalid Details" });
+
+    var set = {
+        deviceStatus : true
+    }
+    
+    result.set(set);
+    const user = await result.save();
+
+    if(!user)
+      throw new Error({ error: "unable to activate device" });
+    
+      return user;
+ 
+};
+
+userSchema.statics.deactivateDevice = async (emailId) => {
+
+  const result =  await User.findOne({'emailId' : emailId });
+
+  if(!result)
+    throw new Error({ error: "Invalid Details" });
+
+  var set = {
+      deviceStatus : false
+  }
+  
+  result.set(set);
+  const user = await result.save();
+
+  if(!user)
+    throw new Error({ error: "unable to activate device" });
+  
+    return user;
+
+};
+
 
 const User = mongoose.model("User", userSchema, "User");
 

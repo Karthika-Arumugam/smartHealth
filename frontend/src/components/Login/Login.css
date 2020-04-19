@@ -1,10 +1,10 @@
 
-.parlex-back {
+.parlex-back-login {
     padding: 20px;  
     margin-top: 15vh;
     align-content: center;
     margin-bottom: 50px;
-    color:#161616;
     background-image: url("/images/1.jpg");
-    opacity: 0.70; 
+    background-color: rgba(255, 255, 255, 0.3);
+    background-blend-mode: overlay;
 }

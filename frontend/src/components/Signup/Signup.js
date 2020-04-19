@@ -9,7 +9,7 @@ import './Signup.css'
 class Signup extends Component {
     render() {
         return (
-            <Container className="parlex-back"  >
+            <Container className="parlex-back-signup"  >
                 <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Create Account</h2>
                 <Form >
                     <Row>
@@ -36,14 +36,14 @@ class Signup extends Component {
 
                     </Row>
                     <Row>
-                        <Form.Group style={{ width: "40%" }} controlId="formGroupEmail" >
+                        <Form.Group style={{ width: "42%" }} controlId="formGroupEmail" >
                             <Form.Control type="email" placeholder="Enter email" />
                         </Form.Group>
-                        <Form.Group style={{ width: "40%" }} controlId="formGroupPassword">
+                        <Form.Group style={{ width: "42%" }} controlId="formGroupPassword">
                             <Form.Control type="password" placeholder="Password" />
                         </Form.Group>
                     </Row>
-                    <Button variant="info" type="submit">Register</Button>
+                    <Button variant="info" type="submit" style={{ marginRight: "3vw" }}>Register</Button>
                     <Link to="/login">Already a member Login here</Link>
                 </Form>
             </Container>

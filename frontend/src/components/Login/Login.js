@@ -10,8 +10,8 @@ class Login extends Component {
     render() {
         
         return (
-            <Container className="parlex-back"  >
-            <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Login</h2>
+            <Container className="parlex-back-login"  >
+            <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
             <Form >
                     <Form.Group style={{ width: "50%" }}controlId="formGroupEmail" >
                        <Form.Control type="email" placeholder="Enter email" required autofocus/>
@@ -19,7 +19,7 @@ class Login extends Component {
                     <Form.Group style={{ width: "50%" }}controlId="formGroupPassword">
                       <Form.Control type="password" placeholder="Password" required/>
                     </Form.Group>
-                   <Button variant="info" type="submit">Login</Button> 
+                   <Button variant="info" type="submit" style={{ marginRight: "2vw" }}>Login</Button> 
                    <Link to="/signup">Create Account?</Link>
                 </Form>
             </Container>

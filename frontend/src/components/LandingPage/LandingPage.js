@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col,Carousel } from 'react-bootstrap';
+import { Container, Row, Col, Carousel } from 'react-bootstrap';
 import './LandingPage.css';
 
 class Main extends Component {
@@ -69,13 +69,13 @@ class Main extends Component {
                         <h2>About Us</h2>
                         <p>At SmartHealth, we leverage an efficient and proven technology of Edge Analytics for our Heart Patients</p>
                     </div>
-                    <div className="row feature design">
+                    <div className="row feature design" style={{ width: "95%", margin: "0 auto" }}>
                         <div className="area1 columns right">
                             <h3>Smart IoT Analytics</h3>
-                            <p>Leverage an efficient IoT connected technology of Edge computing that help diagonise heart health and save in crises.The personalized healthcare system is targeted for patients with known heart ailments people advised to be monitored for preventive measures, healthcare providers including doctors, health care institutions and system admin.
+                            <p className="justify">Leverage an efficient IoT connected technology of Edge computing that help diagonise heart health and save in crises.The personalized healthcare system is targeted for patients with known heart ailments people advised to be monitored for preventive measures, healthcare providers including doctors, health care institutions and system admin.
                             The SmartHealth considers user privacy of utmost important and hence follows the measure of being HIPAA compliant.With SmartHealth intellingent analytics the choosn health care metrics are from certified CQM</p>
                         </div>
-                        <div className="area2 columns feature-media left"><img src={feature} alt="" width="100%"/></div> 
+                        <div className="area2 columns feature-media left"><img src={feature} alt="" width="100%" /></div>
                     </div>
                 </section>
             </div>

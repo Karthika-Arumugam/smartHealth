@@ -335,20 +335,19 @@ background-color: #A43E89;
 
 .carousel-caption {
 	padding: 0px;
-	bottom: 40%;
+	bottom: 30vh !important;
 	display: block;
 	height: 80px;
 }
-.carousel-caption h1 {
+.carousel-caption h3 {
 	font-size: 45px;
 	padding: 10px 15px;
-	background: rgba(128, 180, 33, 0.80);
-	color: #FFFFFF;
+	color: black;
 	text-shadow: none;
 	font-weight: bold;
 	display: inline-block;
 }
-.carousel-caption h3 {
+.carousel-caption p {
 	font-size: 30px;
 	color: #1C4604;
 	font-weight: bold;
@@ -975,4 +974,8 @@ nav#filter li {
 }
 
 
+}
+
+.justify {
+	text-align: justify;
 }

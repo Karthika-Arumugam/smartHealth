@@ -8,7 +8,7 @@ class SiteFooter extends Component {
         return (
             <Container>
                 <Row>
-                    <Col sm={12}><Navbar.Brand href="/" className="animated"><b>SMART<i>HEALTH 2020</i></b></Navbar.Brand><b>Care an Intelligent Edge Computing Platform</b></Col>
+                    <Col sm={12}><Navbar.Brand href="/" className="animated"><b>SMART<i>HEALTH 2020</i></b></Navbar.Brand><b>an Intelligent Edge Computing Platform</b></Col>
                 </Row>
             </Container>
         )

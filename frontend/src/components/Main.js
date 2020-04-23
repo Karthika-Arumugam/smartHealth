@@ -5,6 +5,7 @@ import SiteHeader from './LandingPage/SiteHeader';
 import SiteFooter from './LandingPage/SiteFooter';
 import Login from './Login/Login';
 import Signup from './Signup/Signup';
+import PatientDashboard from './Dashboard/PatientDashboard';
 
 class Main extends Component {
     render() {
@@ -14,6 +15,7 @@ class Main extends Component {
                 <Route exact path="/" component={LandingPage} />
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/signup" component={Signup} />
+                <Route exact path="/patientdash" component={PatientDashboard} />
                 <SiteFooter />
             </BrowserRouter>
         )

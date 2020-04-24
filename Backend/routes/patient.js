@@ -19,7 +19,7 @@ router.get('/dashboard', auth, async (req, res) => {
   }
 });
 
-router.post('/riskStatus', auth, async (req, res) => {
+router.put('/riskStatus', auth, async (req, res) => {
 
   // update patient's risk status
   

@@ -141,13 +141,22 @@ userSchema.statics.getProfile = async (emailId) => {
 };
 
 userSchema.statics.updateProfile = async (req) => {
-  // Search for a user by email and password.
-  // const user = await User.findOne({ req.emailId });
-  // if (!user) {
-  //   throw new Error({ error: "Invalid Details" });
-  // }
 
-  // return user;
+  let email = req.emailId;
+
+  const result =  await User.findOne({'emailId' : email });
+
+  if(!result)
+    return result;
+
+  result.set(req);
+  const user = await result.save();
+
+  if(!user)
+    throw new Error({ message: "unable to update profile" });
+  
+    return user;
+
 };
 
 userSchema.statics.activateDevice = async (emailId) => {
@@ -155,7 +164,7 @@ userSchema.statics.activateDevice = async (emailId) => {
     const result =  await User.findOne({'emailId' : emailId });
 
     if(!result)
-      throw new Error({ error: "Invalid Details" });
+      return result;
 
     var set = {
         deviceStatus : true
@@ -176,7 +185,7 @@ userSchema.statics.deactivateDevice = async (emailId) => {
   const result =  await User.findOne({'emailId' : emailId });
 
   if(!result)
-    throw new Error({ error: "Invalid Details" });
+    return result;
 
   var set = {
       deviceStatus : false

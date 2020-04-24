@@ -111,7 +111,7 @@ router.post("/deactivateDevice", auth, async (req, res) => {
   // update user profile
   try {
 
-    user = await User.activateDevice(req.body.emailId);
+    user = await User.deactivateDevice(req.body.emailId);
 
     if(user)
       res.json({"deviceStatus" : false});

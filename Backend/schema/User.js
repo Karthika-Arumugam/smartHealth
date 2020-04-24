@@ -186,7 +186,7 @@ userSchema.statics.deactivateDevice = async (emailId) => {
   const user = await result.save();
 
   if(!user)
-    throw new Error({ error: "unable to activate device" });
+    throw new Error({ error: "unable to deactivate device" });
   
     return user;
 

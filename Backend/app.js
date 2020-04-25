@@ -9,10 +9,11 @@ require("./DAL");
 
 var usersRouter = require('./routes/user');
 var patientRouter = require('./routes/patient');
+var simulatorRouter = require('./routes/simulatedData');
 
 //view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+ app.set('view engine', 'ejs');
 //use cors to allow cross origin resource sharing
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(logger('dev'));
@@ -28,6 +29,7 @@ app.use(express.json());
 
 app.use(`/api/${apiVersion}/users`, usersRouter);
 app.use(`/api/${apiVersion}/patient`, patientRouter);
+app.use(`/api/${apiVersion}/simulator`, simulatorRouter);
 
 
 // catch 404 and forward to error handler

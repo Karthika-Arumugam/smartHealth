@@ -16,16 +16,16 @@ const patientSchema = mongoose.Schema({
     },
   },
 
-  time: {
+  time: [{
     type: Date,
     required: true,
-  },
+  }],
 
-  riskStatus : {
+  riskStatus : [{
     type : Number,
     required: true
 
-  },
+  }],
 
   healthcareProvider : {
     type : String,
@@ -121,6 +121,10 @@ patientSchema.pre("save", async function (next) {
 patientSchema.statics.getDashboard = async (emailId) => {
   // get patient dashboard details  by email 
   const patient = await Patient.findOne({ emailId });
+
+  patient.riskStatus = patient.riskStatus.reverse().splice(0,20);
+  patient.time = patient.time.reverse().splice(0,20);
+
   
   if (!patient) {
     throw new Error({ error: "Invalid Details" });
@@ -134,8 +138,8 @@ patientSchema.statics.updateRiskStatus = async (emailId,riskStatus) => {
 
   var set = {
     emailId : emailId,
-    riskStatus : riskStatus,
-    time : new Date()
+    riskStatus : [...patient.riskStatus,riskStatus],
+    time : [...patient.time,new Date()]
 }
 
   if (!patient) {

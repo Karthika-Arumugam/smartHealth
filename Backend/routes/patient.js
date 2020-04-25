@@ -19,11 +19,10 @@ router.get('/dashboard', auth, async (req, res) => {
       heartRates.push(element.heartRate)
     });
    
-    patient = {...patient, heartRates : heartRates };
-
-
+   
 
     let result = JSON.parse(JSON.stringify(patient));
+    result = {...result, heartRates : heartRates };
     res.json(result);
 
   } catch (error) {

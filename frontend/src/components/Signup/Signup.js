@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Container, Row, Col, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from 'react-router-dom';
@@ -14,18 +14,6 @@ class Signup extends Component {
             isHealthCareProvider: false,
             message: ''
         };
-        this.firstnameRef = React.createRef();
-        this.lastnameRef = React.createRef();
-        this.emailRef = React.createRef();
-        this.passwordRef = React.createRef();
-        this.phoneRef = React.createRef();
-        this.ageRef = React.createRef();
-        this.addRef = React.createRef();
-        this.cityRef = React.createRef();
-        this.stateRef = React.createRef();
-        this.zipRef = React.createRef();
-        this.emerRef = React.createRef();
-        this.genderRef = React.createRef();
     }
 
     onClickHealthCareProviderCheckbox() {
@@ -36,21 +24,29 @@ class Signup extends Component {
 
     onSubmit = async e => {
         e.preventDefault();
+        const { firstname, lastname, email, password, age, phoneNumber, emergencyContact, gender, address, city, state, zipcode, providerName } = e.target.elements;
         const person = {
-            firstName: this.firstnameRef.current.value,
-            lastName: this.lastnameRef.current.value,
-            emailId: this.emailRef.current.value,
-            password: this.passwordRef.current.value,
-            userGroup: this.state.isHealthCareProvider === true ? 'Healthcare' : 'Patient',
-            phone: this.phoneRef.current.value,
-            age: this.ageRef.current.value,
-            emergencyContact: this.emerRef.current.value,
-            address: this.addRef.current.value,
-            city: this.cityRef.current.value,
-            state: this.stateRef.current.value,
-            zip: this.zipRef.current.value,
-            genderRef: this.genderRef.current.value
-
+            firstName: firstname.value,
+            lastName: lastname.value,
+            emailId: email.value,
+            password: password.value,
+            address: address.value,
+            city: city.value,
+            state: state.value,
+            zip: zipcode.value,
+            userGroup: this.state.isHealthCareProvider ? 'Healthcare' : 'Patient',
+            ...(
+                this.state.isHealthCareProvider ?
+                    {
+                        healthCareProvider: providerName.value
+                    } :
+                    {
+                        gender: gender.value,
+                        phone: phoneNumber.value,
+                        age: age.value,
+                        emergencyContact: emergencyContact.value,
+                    }
+            )
         };
         const sleep = msec => new Promise(r => setTimeout(r, msec));
         try {
@@ -91,62 +87,122 @@ class Signup extends Component {
                         onClick={this.onClickHealthCareProviderCheckbox.bind(this)}
                     />
                 </Row>
-                <Form onSubmit={this.onSubmit.bind(this)}>
-                    <Row>
-                        <Col><Form.Group>
-                            <Form.Control ref={this.firstnameRef} type="text" placeholder="Enter First Name" autofocus required />
-                        </Form.Group></Col>
-                        <Col><Form.Group>
-                            <Form.Control ref={this.lastnameRef} type="text" placeholder="Enter Last Name" required />
-                        </Form.Group></Col>
-                    </Row>
-                    <Row>
-                        <Col md={5}><Form.Group>
-                            <Form.Control ref={this.emailRef} type="email" placeholder="Enter email" />
-                        </Form.Group></Col>
-                        <Col md={5}><Form.Group>
-                            <Form.Control ref={this.passwordRef} type="password" placeholder="Password" />
-                        </Form.Group></Col>
-                        <Col md={2}><Form.Group>
-                            <Form.Control ref={this.ageRef} type="number" min="1" max="150" placeholder="Select Age" required />
-                        </Form.Group></Col>
-                    </Row>
-                    <Row>
-                        <Col><Form.Group>
-                            <Form.Control ref={this.phoneRef} type="tel" placeholder="PhoneNumber" />
-                        </Form.Group></Col>
-                        <Col><Form.Group>
-                            <Form.Control ref={this.emerRef} type="tel" placeholder="Emergency Contact" required />
-                        </Form.Group>
-                        </Col>
-                        <Col><Form.Group >
-                            <DropdownButton  title="Select Gender"  variant='info'>
-                                <Form.Control ref={this.genderRef} />
-                                <Dropdown.Item eventKey="1">Male</Dropdown.Item>
-                                <Dropdown.Item eventKey="2">Female</Dropdown.Item>
-                                <Dropdown.Item eventKey="3">Other</Dropdown.Item>
-                            </DropdownButton>
-                        </Form.Group></Col>
-                    </Row>
-                    <Row>
-                        <Col md={5}><Form.Group>
-                            <Form.Control ref={this.addRef} type="text" placeholder="Enter Address" required />
-                        </Form.Group></Col>
-                        <Col md={3}><Form.Group>
-                            <Form.Control ref={this.cityRef} type="text" placeholder="Enter City" required />
-                        </Form.Group></Col>
-                        <Col md={2}><Form.Group>
-                            <Form.Control ref={this.stateRef} type="text" placeholder="Enter State" required />
-                        </Form.Group></Col>
-                        <Col md={2}><Form.Group>
-                            <Form.Control ref={this.zipRef} type="text" inputmode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" placeholder="Enter Zip" required />
-                        </Form.Group></Col>
-                    </Row>
-                    
-                    <Button variant="info" type="submit" style={{ marginRight: "3vw" }}>Register</Button>
-                    <Link to="/login">Already a member Login here</Link>
-                    <pre>{this.state.message}</pre>
-                </Form>
+                <Container style={{ width: "80%", margin: "0 auto" }}>
+                    <Form onSubmit={this.onSubmit.bind(this)}>
+                        <Row className="signup-row">
+                            <Col md={6}>
+                                <Form.Control name="firstname" type="text" placeholder="First Name" autofocus required />
+                            </Col>
+                            <Col md={6}>
+                                <Form.Control name="lastname" type="text" placeholder="Last Name" required />
+                            </Col>
+                        </Row>
+                        <Row className="signup-row">
+                            <Col md={6}>
+                                <Form.Control name="email" type="email" placeholder="email" required />
+                            </Col>
+                            <Col md={6}>
+                                <Form.Control name="password" type="password" placeholder="Password" required />
+                            </Col>
+                        </Row>
+                        <Row className="signup-row">
+                            <Col md={5}>
+                                <Form.Control name="address" type="text" placeholder="Address" required />
+                            </Col>
+                            <Col md={3}>
+                                <Form.Control name="city" type="text" placeholder="City" required />
+                            </Col>
+                            <Col md={2}>
+                                <Form.Control name="state" as="select" required>
+                                    <option>AL</option>
+                                    <option>AK</option>
+                                    <option>AZ</option>
+                                    <option>AR</option>
+                                    <option>CA</option>
+                                    <option>CO</option>
+                                    <option>CT</option>
+                                    <option>DE</option>
+                                    <option>DC</option>
+                                    <option>FL</option>
+                                    <option>GA</option>
+                                    <option>HI</option>
+                                    <option>ID</option>
+                                    <option>IL</option>
+                                    <option>IN</option>
+                                    <option>IA</option>
+                                    <option>KS</option>
+                                    <option>KY</option>
+                                    <option>LA</option>
+                                    <option>ME</option>
+                                    <option>MD</option>
+                                    <option>MA</option>
+                                    <option>MI</option>
+                                    <option>MN</option>
+                                    <option>MS</option>
+                                    <option>MO</option>
+                                    <option>MT</option>
+                                    <option>NE</option>
+                                    <option>NV</option>
+                                    <option>NH</option>
+                                    <option>NJ</option>
+                                    <option>NM</option>
+                                    <option>NY</option>
+                                    <option>NC</option>
+                                    <option>ND</option>
+                                    <option>OH</option>
+                                    <option>OK</option>
+                                    <option>OR</option>
+                                    <option>PA</option>
+                                    <option>RI</option>
+                                    <option>SC</option>
+                                    <option>SD</option>
+                                    <option>TN</option>
+                                    <option>TX</option>
+                                    <option>UT</option>
+                                    <option>VT</option>
+                                    <option>VA</option>
+                                    <option>WA</option>
+                                    <option>WV</option>
+                                    <option>WI</option>
+                                    <option>WY</option>
+                                </Form.Control>
+                            </Col>
+                            <Col md={2}>
+                                <Form.Control name="zipcode" type="text" inputmode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" placeholder="Zip" required />
+                            </Col>
+                        </Row>
+                        {this.state.isHealthCareProvider ?
+                            (<Row>
+                                <Col md={3}></Col>
+                                <Col md={6}>
+                                    <Form.Control name="providerName" type="text" placeholder="Provider name" required />
+                                </Col>
+                                <Col md={3}></Col>
+                            </Row>) :
+                            (<Row className="signup-row">
+                                <Col md={4}>
+                                    <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Control name="emergencyContact" type="tel" placeholder="Emergency Contact" required />
+                                </Col>
+                                <Col md={2}>
+                                    <Form.Control name="gender" as="select" required>
+                                        <option>Male</option>
+                                        <option selected>Female</option>
+                                        <option>Other</option>
+                                    </Form.Control>
+                                </Col>
+                                <Col md={2}>
+                                    <Form.Control name="age" type="number" min="0" max="150" placeholder="Age" required />
+                                </Col>
+                            </Row>)
+                        }
+                        <Button variant="info" type="submit" style={{ marginRight: "3vw" }}>Register</Button>
+                        <Link to="/login">Already a member Login here</Link>
+                        <pre>{this.state.message}</pre>
+                    </Form>
+                </Container>
             </Container>
         );
     }

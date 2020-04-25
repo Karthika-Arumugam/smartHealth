@@ -11,3 +11,8 @@
     background-size: cover;
     background-repeat: no-repeat;
 }
+
+.signup-row {
+    width: 100% !important;
+    margin: auto !important;
+}

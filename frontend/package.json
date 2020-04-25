@@ -11,6 +11,8 @@
     "@testing-library/user-event": "^7.1.2",
     "bootstrap": "^4.4.1",
     "browser-router": "^0.2.0",
+    "highcharts": "^8.0.4",
+    "highcharts-react-official": "^3.0.0",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",

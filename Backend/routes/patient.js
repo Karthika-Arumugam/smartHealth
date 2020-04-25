@@ -1,5 +1,6 @@
 const express = require("express");
 const Patient = require("../schema/Patient");
+const SimulatedData = require("../schema/SimulatedData");
 const auth = require("../middleware/auth");
 
 const router = express.Router();
@@ -11,6 +12,17 @@ router.get('/dashboard', auth, async (req, res) => {
   try {
 
     let patient  = await Patient.getDashboard(req.query.emailId);
+    let heartRatesData  = await SimulatedData.getHeartrate(req.query.emailId);
+
+    let heartRates = [];
+    heartRatesData.forEach(element => {
+      heartRates.push(element.heartRate)
+    });
+   
+    patient = {...patient, heartRates : heartRates };
+
+
+
     let result = JSON.parse(JSON.stringify(patient));
     res.json(result);
 

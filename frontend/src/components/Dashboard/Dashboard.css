@@ -7,7 +7,7 @@
   }
 .text-stats-panel {
     margin: 0 auto;
-    background-color:blanchedalmond; 
+    background-color:rgb(246, 238, 226); 
     text-align: center;
     font-size: calc(10px + 2vmin);
 }

@@ -4,7 +4,15 @@ import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 class SiteHeader extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            authToken: localStorage.getItem('token') || ''
+        }
+    }
+
     render() {
+
         return (
             <Navbar expand="xl" bg="light" variant="light" >
                 &nbsp;&nbsp;<FontAwesomeIcon icon={faHeartbeat} size="lg" />&nbsp;&nbsp;
@@ -13,7 +21,7 @@ class SiteHeader extends Component {
                     <Nav.Link href="#home"><b>Services</b></Nav.Link>
                     <Nav.Link href="#features"><b>About Us</b></Nav.Link>
                     <Nav.Link href="#pricing"><b>Doctors</b></Nav.Link>
-                    <Nav.Link href="/login"><b>Account</b></Nav.Link>
+                    {this.state.authToken == '' ? <Nav.Link href="/login"><b>Account</b></Nav.Link> : <Nav.Link onClick={() => localStorage.clear()} href="/"><b>Logout</b></Nav.Link>}
                 </Nav>
             </Navbar >
         )

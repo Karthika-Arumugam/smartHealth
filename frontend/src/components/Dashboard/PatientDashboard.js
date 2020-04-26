@@ -7,41 +7,66 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import './Dashboard.css';
 
 class PatientDashboard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            stats4Risk: [],
+            heartRate: [],
+            alerts: [],
+            medication: [],
+            doctor: [],
+            time: [],
+            docCount: 0,
+            medCount: 0,
+            riskPercent: {},
+            deviceName: "R343S"
+        }
+    }
+    async componentDidMount() {
+        let heartRateData = [];
+        let riskStatusData = [];
+        let highRiskCount = 0, lowRiskcount = 0;
 
+        try {
+            const authToken = localStorage.getItem('token') || '';
+            const email = localStorage.getItem('email') || ''
+            const response = await fetch(`/api/v1/patient/dashboard?emailId=${email}`, {
+                method: 'get',
+                mode: "cors",
+                redirect: 'follow',
+                headers: {
+                    'content-type': 'application/json',
+                    'Authorization': authToken
+                },
+            });
+            const body = await response.json();
+            if (response.status === 200) {
+                if (body) {
+                    for (let index in body.time) {
+                        heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                        riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
+                        body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
+                    }
+                    const total = highRiskCount + lowRiskcount;
+                    this.setState({
+                        stats4Risk: riskStatusData,
+                        heartRate: heartRateData,
+                        docCount: body.allocatedSpecialists.length,
+                        medCount: body.medications.length,
+                        riskPercent: {
+                            High: (highRiskCount / total) * 100,
+                            Low: (lowRiskcount / total) * 100
+                        }
+                    })
+                }
+            }
+            this.setState({ message: response.status === 200 ? 'account created successfully! please login to continue...' : body.message });
+        } catch (e) {
+            this.setState({ message: e.message || e });
+        }
+    }
     render() {
-        const ranges = [
-            [1246406400000, 14.3, 27.7],
-            [1246492800000, 14.5, 27.8],
-            [1246579200000, 15.5, 29.6],
-            [1246665600000, 16.7, 30.7],
-            [1246752000000, 16.5, 25.0],
-            [1246838400000, 17.8, 25.7],
-            [1246924800000, 13.5, 24.8],
-            [1247011200000, 10.5, 21.4],
-            [1247097600000, 9.2, 23.8],
-            [1247184000000, 11.6, 21.8],
-            [1247270400000, 10.7, 23.7],
-            [1247356800000, 11.0, 23.3],
-            [1247443200000, 11.6, 23.7],
-            [1247529600000, 11.8, 20.7],
-            [1247616000000, 12.6, 22.4],
-            [1247702400000, 13.6, 19.6],
-            [1247788800000, 11.4, 22.6],
-            [1247875200000, 13.2, 25.0],
-            [1247961600000, 14.2, 21.6],
-            [1248048000000, 13.1, 17.1],
-            [1248134400000, 12.2, 15.5],
-            [1248220800000, 12.0, 20.8],
-            [1248307200000, 12.0, 17.1],
-            [1248393600000, 12.7, 18.3],
-            [1248480000000, 12.4, 19.4],
-            [1248566400000, 12.6, 19.9],
-            [1248652800000, 11.9, 20.2],
-            [1248739200000, 11.0, 19.3],
-            [1248825600000, 10.8, 17.8],
-            [1248912000000, 11.8, 18.5],
-            [1248998400000, 10.8, 16.1]
-        ]
+
         const heartRate = {
             colors: ['#7cb5ec', '#f7a35c', '#90ee7e', '#7798BF', '#aaeeee', '#ff0066',
                 '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
@@ -108,7 +133,8 @@ class PatientDashboard extends Component {
             },
             series: [{
                 name: 'Heatbeat',
-                data: ranges,
+                data: this.state.heartRate,
+                // data: ranges,
                 type: 'area',
                 lineWidth: 0,
                 linkedTo: ':previous',
@@ -124,7 +150,7 @@ class PatientDashboard extends Component {
         };
         const healthstats4Risk = {
             chart: {
-                type: 'area',
+                type: 'line',
                 scrollablePlotArea: {
                     minWidth: 600,
                     scrollPositionX: 1
@@ -222,13 +248,7 @@ class PatientDashboard extends Component {
             },
             series: [{
                 name: 'Health Risk %',
-                data: [
-                    3.7, 3.3, 3.9, 5.1, 3.5, 3.8, 4.0, 5.0, 6.1, 3.7, 3.3, 6.4,
-                    6.9, 6.0, 6.8, 4.4, 4.0, 3.8, 5.0, 4.9, 9.2, 9.6, 9.5, 6.3,
-                    9.5, 10.8, 14.0, 11.5, 13, 10.0, 14, 10.2, 10.3, 9.4, 8.9, 10.6, 10.5, 11.1,
-                    10.4, 10.7, 11.3, 10.2, 9.6, 10.2, 11.1, 10.8, 13.0, 12.5, 12.5, 11.3,
-                    10.1, 13, 60, 60, 55
-                ],
+                data: this.state.stats4Risk,
             }],
             navigation: {
                 menuItemStyle: {
@@ -279,8 +299,8 @@ class PatientDashboard extends Component {
                 name: 'HealthRisk',
                 innerSize: '55%',
                 data: [
-                    ['High', 20],
-                    ['Low', 80],
+                    ['Low', this.state.riskPercent.Low],
+                    ['High', this.state.riskPercent.High],
                     {
                         dataLabels: {
                             enabled: true
@@ -337,28 +357,28 @@ class PatientDashboard extends Component {
                     width: 1,
                     color: '#808080'
                 }],
-                  plotBands: [{ // Low
-                from: 0,
-                to: 0.5,
-                // color: 'rgb(229, 238, 176)',
-                color: 'rgb(234, 241, 195)',
-                label: {
-                    text: 'Low',
-                    style: {
-                        color: '#606060'
+                plotBands: [{ // Low
+                    from: 0,
+                    to: 0.5,
+                    // color: 'rgb(229, 238, 176)',
+                    color: 'rgb(234, 241, 195)',
+                    label: {
+                        text: 'Low',
+                        style: {
+                            color: '#606060'
+                        }
                     }
-                }
-            }, { // critical
-                from: 0.5,
-                to: 1,
-                color: 'rgb(246, 191, 191)',
-                label: {
-                    text: 'Critical',
-                    style: {
-                        color: '#606060'
+                }, { // critical
+                    from: 0.5,
+                    to: 1,
+                    color: 'rgb(246, 191, 191)',
+                    label: {
+                        text: 'Critical',
+                        style: {
+                            color: '#606060'
+                        }
                     }
-                }
-            }]
+                }]
             },
             tooltip: {
                 headerFormat: '<b>{series.name}</b><br/>',
@@ -387,7 +407,7 @@ class PatientDashboard extends Component {
                     return data;
                 }())
             }],
-          
+
         }
         return (
             <Container>
@@ -410,9 +430,9 @@ class PatientDashboard extends Component {
                         </div>
                     </Row>
                     <Row className='text-stats-panel' style={{ width: "100%" }} >
-                        <Col><h1><Badge variant="success">Device Active</Badge></h1></Col>
-                        <Col><h1><Badge variant="warning">My Doctors</Badge></h1></Col>
-                        <Col><h1><Badge variant="info">Medication</Badge></h1></Col>
+                        <Col><h1><Badge variant="success">Device Active<br></br>{this.state.deviceName}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                        <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                        <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
                     </Row>
                 </Row>
                 <Row>

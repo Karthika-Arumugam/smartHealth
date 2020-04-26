@@ -13,7 +13,8 @@ class Login extends Component {
             username: "",
             password: "",
             msg: '',
-            authFlag: ""
+            authFlag: "",
+            token: ''
         }
         this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
         this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
@@ -50,9 +51,12 @@ class Login extends Component {
         }).then(async response => {
             await sleep(2000);
             if (response.status === 200) {
+                localStorage.setItem('token', response.body.token);
+                localStorage.setItem('email', this.state.username);
                 this.setState({
-                    authFlag: true
-                })
+                    authFlag: true,
+                    token: response.body.token
+                });
             } else {
                 this.setState({
                     authFlag: false,

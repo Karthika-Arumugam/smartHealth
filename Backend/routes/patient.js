@@ -2,17 +2,25 @@ const express = require("express");
 const Patient = require("../schema/Patient");
 const SimulatedData = require("../schema/SimulatedData");
 const auth = require("../middleware/auth");
+const { JWT_KEY} = require('../config.js');
+
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
-router.get('/dashboard', auth, async (req, res) => {
+router.get('/dashboard', async (req, res) => {
 
   // get patient's dashboard
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
   
   try {
+    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
 
-    let patient  = await Patient.getDashboard(req.query.emailId);
-    let heartRatesData  = await SimulatedData.getHeartrate(req.query.emailId);
+    let patient  = await Patient.getDashboard(user.emailId);
+    let heartRatesData  = await SimulatedData.getHeartrate(user.emailId);
 
     let heartRates = [];
     heartRatesData.forEach(element => {
@@ -26,17 +34,22 @@ router.get('/dashboard', auth, async (req, res) => {
     res.json(result);
 
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).json({message : error.message});
   }
 });
 
-router.put('/riskStatus', auth, async (req, res) => {
+router.put('/riskStatus', async (req, res) => {
 
   // update patient's risk status
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
   
   try {
 
-    let patient  = await Patient.updateRiskStatus(req.query.emailId, req.body.riskStatus);
+    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
+    let patient  = await Patient.updateRiskStatus(user.emailId, req.body.riskStatus);
     let result = JSON.parse(JSON.stringify(patient));
     res.json(result);
 

@@ -87,16 +87,7 @@ const userSchema = mongoose.Schema({
   deviceStatus : {
     type : Boolean,
     required : false
-  },
-
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  }
 });
 
 userSchema.pre("save", async function (next) {
@@ -160,6 +151,7 @@ userSchema.statics.updateProfile = async (req) => {
 };
 
 userSchema.statics.activateDevice = async (emailId) => {
+  
 
     const result =  await User.findOne({'emailId' : emailId });
 

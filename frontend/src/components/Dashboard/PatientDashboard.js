@@ -5,6 +5,7 @@ import Highcharts from 'highcharts/highstock';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import './Dashboard.css';
+import cookie from 'react-cookies';
 
 class PatientDashboard extends Component {
     constructor(props) {
@@ -28,39 +29,42 @@ class PatientDashboard extends Component {
         let highRiskCount = 0, lowRiskcount = 0;
 
         try {
-            const authToken = localStorage.getItem('token') || '';
-            const email = localStorage.getItem('email') || ''
-            const response = await fetch(`/api/v1/patient/dashboard?emailId=${email}`, {
-                method: 'get',
-                mode: "cors",
-                redirect: 'follow',
-                headers: {
-                    'content-type': 'application/json',
-                    'Authorization': authToken
-                },
-            });
-            const body = await response.json();
-            if (response.status === 200) {
-                if (body) {
-                    for (let index in body.time) {
-                        heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
-                        riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
-                        body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
-                    }
-                    const total = highRiskCount + lowRiskcount;
-                    this.setState({
-                        stats4Risk: riskStatusData,
-                        heartRate: heartRateData,
-                        docCount: body.allocatedSpecialists.length,
-                        medCount: body.medications.length,
-                        riskPercent: {
-                            High: (highRiskCount / total) * 100,
-                            Low: (lowRiskcount / total) * 100
+            const authToken = cookie.load('cookie') || '';
+            if (authToken) {
+                const { id, emailId, userGroup } = JSON.parse(window.atob(authToken.split('.')[1]));
+                //TO ADD LOGIC FOR userGroup is Patient then call patient dashboard
+                const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                const body = await response.json();
+                if (response.status === 200) {
+                    if (body) {
+                        for (let index in body.time) {
+                            heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
+                            body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
                         }
-                    })
+                        const total = highRiskCount + lowRiskcount;
+                        this.setState({
+                            stats4Risk: riskStatusData,
+                            heartRate: heartRateData,
+                            docCount: body.allocatedSpecialists.length,
+                            medCount: body.medications.length,
+                            riskPercent: {
+                                High: (highRiskCount / total) * 100,
+                                Low: (lowRiskcount / total) * 100
+                            }
+                        })
+                    }
                 }
+                this.setState({ message: response.status === 200 ? 'account created successfully! please login to continue...' : body.message });
             }
-            this.setState({ message: response.status === 200 ? 'account created successfully! please login to continue...' : body.message });
         } catch (e) {
             this.setState({ message: e.message || e });
         }

@@ -3,6 +3,12 @@ import { Container, Row, Col, Carousel } from 'react-bootstrap';
 import './LandingPage.css';
 
 class Main extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoggedIn: props.getLogin,
+        }
+    }
     render() {
         const slide1 = '/images/1.jpg';
         const slide2 = './images/2.jpg';
@@ -37,7 +43,7 @@ class Main extends Component {
                             <p>An efficient way to care for heart health</p>
                         </Carousel.Caption>
                     </Carousel.Item>
-                </Carousel><br></br><br></br>
+                </Carousel> <br></br> <br></br>
                 <section className="page-section colord">
                     <Container >
                         <Row>
@@ -78,7 +84,7 @@ class Main extends Component {
                         <div className="area2 columns feature-media left"><img src={feature} alt="" width="100%" /></div>
                     </div>
                 </section>
-            </div>
+            </div >
         )
     }
 }

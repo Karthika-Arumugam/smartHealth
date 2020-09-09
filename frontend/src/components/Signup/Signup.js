@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import './Signup.css'
-
+import cookie from 'react-cookies';
 
 class Signup extends Component {
 
@@ -12,7 +12,8 @@ class Signup extends Component {
         super(props);
         this.state = {
             isHealthCareProvider: false,
-            message: ''
+            message: '',
+            isLogin: cookie.load('cookie') || "",
         };
     }
 
@@ -62,12 +63,9 @@ class Signup extends Component {
             const body = await response.json();
             console.log(body);
             await sleep(2000);
-            // this.props.toggleSpinner();
             if (response.status === 201) {
-                console.log('calling redux signup');
-                // this.props.signup(person.email);
+                this.setState({ message: response.status === 201 ? 'account created successfully! please login to continue...' : body.message });
             }
-            this.setState({ message: response.status === 201 ? 'account created successfully! please login to continue...' : body.message });
         } catch (e) {
             await sleep(2000);
             this.setState({ message: e.message || e });
@@ -77,6 +75,7 @@ class Signup extends Component {
     render() {
         return (
             <Container className="parlex-back-signup">
+                {this.state.isLogin ? <Redirect to="/patientdash" /> : ""}
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Create Account</h2>
                 <Row style={{ width: "20%", margin: "0 auto", marginTop: "2vh", marginBottom: "2vh" }}>
                     <Form.Check

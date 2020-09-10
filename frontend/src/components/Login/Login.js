@@ -4,6 +4,7 @@ import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, Redirect } from 'react-router-dom';
 import './Login.css'
+import cookie from 'react-cookies';
 
 class Login extends Component {
 
@@ -13,12 +14,13 @@ class Login extends Component {
             username: "",
             password: "",
             msg: '',
-            authFlag: "",
-            token: ''
+            authFlag: cookie.load('cookie') || "",
+            token: '',
         }
         this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
         this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
         this.submitLogin = this.submitLogin.bind(this);
+        this.loginHandler = this.props.loginHandler.bind(this);
     }
     usernameChangeHandler = (e) => {
         this.setState({
@@ -51,12 +53,11 @@ class Login extends Component {
         }).then(async response => {
             await sleep(2000);
             if (response.status === 200) {
-                localStorage.setItem('token', response.body.token);
-                localStorage.setItem('email', this.state.username);
                 this.setState({
                     authFlag: true,
                     token: response.body.token
                 });
+                this.loginHandler();
             } else {
                 this.setState({
                     authFlag: false,
@@ -70,11 +71,10 @@ class Login extends Component {
     }
 
     render() {
-
         return (
             <Container className="parlex-back-login"  >
                 {this.state.authFlag ? <Redirect to="/patientdash" /> : ""}
-                <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
+                <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
                 <Form onSubmit={this.submitLogin}>
                     <Form.Group style={{ width: "50%" }} controlId="formGroupEmail" >
                         <Form.Control type="email" placeholder="Enter email" onChange={this.usernameChangeHandler} required autofocus />

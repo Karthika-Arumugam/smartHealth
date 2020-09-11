@@ -6,6 +6,7 @@ import SiteFooter from './LandingPage/SiteFooter';
 import Login from './Login/Login';
 import Signup from './Signup/Signup';
 import PatientDashboard from './Dashboard/PatientDashboard';
+import HealthCareDashboard from './Dashboard/HealthCareDashboard';
 import cookie from 'react-cookies';
 
 class Main extends Component {
@@ -29,6 +30,7 @@ class Main extends Component {
                 <Route exact path="/login" render={props => <Login {...props} loginHandler={this.loginHandler.bind(this)} />} />
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/patientdash" component={PatientDashboard} />
+                <Route exact path="/healthdash" component={HealthCareDashboard} />
                 <SiteFooter />
             </BrowserRouter>
         )

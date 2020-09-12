@@ -14,8 +14,9 @@ class Login extends Component {
             username: "",
             password: "",
             msg: '',
-            authFlag: cookie.load('cookie') || "",
+            authFlag: cookie.load('cookie') || false,
             token: '',
+            usergroup: ""
         }
         this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
         this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
@@ -53,11 +54,13 @@ class Login extends Component {
         }).then(async response => {
             await sleep(2000);
             if (response.status === 200) {
+                const { userGroup: usergroup } = JSON.parse(window.atob(cookie.load('cookie').split('.')[1]));
                 this.setState({
                     authFlag: true,
-                    token: response.body.token
+                    token: response.body.token,
+                    usergroup
                 });
-                this.loginHandler();
+                this.loginHandler(); // update parent component login state
             } else {
                 this.setState({
                     authFlag: false,
@@ -72,8 +75,9 @@ class Login extends Component {
 
     render() {
         return (
-            <Container className="parlex-back-login"  >
-                {this.state.authFlag ? <Redirect to="/patientdash" /> : ""}
+            <Container className="parlex-back-login">
+                {/* TO ADD IT ADMIN CONDITION */}
+                {this.state.authFlag && this.state.usergroup === 'Patient' ? <Redirect to="/patientdash" /> : this.state.authFlag && this.state.usergroup === 'Healthcare' ? <Redirect to="/healthdash" /> : ""}
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
                 <Form onSubmit={this.submitLogin}>
                     <Form.Group style={{ width: "50%" }} controlId="formGroupEmail" >

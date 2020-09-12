@@ -29,7 +29,7 @@ class SiteHeader extends Component {
                 <Navbar.Brand href="/" className="animated bounceInLeft"><b>SMART<i>HEALTH</i></b></Navbar.Brand>
                 <Nav className="mr-auto">
                     {this.state.isLoggedIn === false ? <Nav.Link href="#home"><b>Services</b></Nav.Link> : <Nav.Link href="/patientdash"><b>Dashboard</b></Nav.Link>}
-                    {this.state.isLoggedIn === false ? <Nav.Link href="#features"><b>About Us</b></Nav.Link> : <Nav.Link ><b>Profile</b></Nav.Link>}
+                    {this.state.isLoggedIn === false ? <Nav.Link href="#features"><b>About Us</b></Nav.Link> : <Nav.Link href="/patientprof"><b>Profile</b></Nav.Link>}
                     {this.state.isLoggedIn === false ? <Nav.Link href="#pricing"><b>Doctors</b></Nav.Link> : <Nav.Link ><b>Account</b></Nav.Link>}
                     {this.state.isLoggedIn === false ? <Nav.Link href="/login"><b>Login</b></Nav.Link> : <Nav.Link onClick={() => cookie.remove('cookie', { path: '/' })} href="/"><b>Logout</b></Nav.Link>}
                 </Nav>

@@ -14,7 +14,7 @@ class Login extends Component {
             username: "",
             password: "",
             msg: '',
-            authFlag: cookie.load('cookie') || "",
+            authFlag: cookie.load('cookie') || false,
             token: '',
             usergroup: ""
         }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
+import cookie from 'react-cookies';
 import LandingPage from './LandingPage/LandingPage';
 import SiteHeader from './LandingPage/SiteHeader';
 import SiteFooter from './LandingPage/SiteFooter';
@@ -7,7 +8,7 @@ import Login from './Login/Login';
 import Signup from './Signup/Signup';
 import PatientDashboard from './Dashboard/PatientDashboard';
 import HealthCareDashboard from './Dashboard/HealthCareDashboard';
-import cookie from 'react-cookies';
+import PatientProfile from './Profile/PatientProfile';
 
 class Main extends Component {
     constructor(props) {
@@ -31,6 +32,7 @@ class Main extends Component {
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/patientdash" component={PatientDashboard} />
                 <Route exact path="/healthdash" component={HealthCareDashboard} />
+                <Route exact path="/patientprof" component={PatientProfile} />
                 <SiteFooter />
             </BrowserRouter>
         )

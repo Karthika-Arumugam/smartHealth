@@ -24,6 +24,7 @@ class PatientProfile extends Component {
             zip: "",
             emergencyContact: "",
             age: "",
+            phone: ""
         };
     }
     async componentDidMount() {
@@ -72,6 +73,54 @@ class PatientProfile extends Component {
         });
     }
     onSubmit = async e => {
+        e.preventDefault();
+        const { firstname, lastname, password, age, phoneNumber, emergencyContact, gender, address, city, state, zipcode, cigsperday, smokeyears } = e.target.elements;
+        const person = {
+            firstName: firstname.value !== this.state.firstName ? firstname.value : undefined,
+            lastName: lastname.value && lastname.value !== this.state.lastName ? lastname.value : undefined,
+            emailId: this.state.emailId,
+            password: password.value && password.value !== this.state.password ? password.value : undefined,
+            address: address.value && address.value !== this.state.address ? address.value : undefined,
+            city: city.value && city.value !== this.state.city ? city.value : undefined,
+            state: state.value && state.value !== this.state.state ? state.value : undefined,
+            zip: zipcode.value && zipcode.value !== this.state.zip ? zipcode.value : undefined,
+            gender: gender.value && gender.value !== this.state.gender ? gender.value : undefined,
+            phone: phoneNumber.value && phoneNumber.value !== this.state.phone ? phoneNumber.value : undefined,
+            age: age.value && age.value !== this.state.age ? age.value : undefined,
+            emergencyContact: emergencyContact.value && emergencyContact.value !== this.state.emergencyContact ? emergencyContact.value : undefined,
+            ...(this.state.isSmoker ?
+                {
+                    cigsperday: cigsperday.value,
+                    smokeyears: smokeyears.value
+                } :
+                {
+                    cigsperday: 0,
+                    smokeyears: 0
+                }
+            )
+        };
+
+        const sleep = msec => new Promise(r => setTimeout(r, msec));
+        try {
+            const response = await fetch('/api/v1/users/profile', {
+                method: 'post',
+                mode: "cors",
+                redirect: 'follow',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(person)
+            });
+            const body = await response.json();
+            console.log(body);
+            await sleep(2000);
+            if (response.status === 200) {
+                this.setState({ message: response.status === 201 ? 'profile updated successfully! please login to continue...' : body.message });
+            }
+        } catch (e) {
+            await sleep(2000);
+            this.setState({ message: e.message || e });
+        }
     };
     render() {
         return (
@@ -83,26 +132,26 @@ class PatientProfile extends Component {
                     <Form onSubmit={this.onSubmit.bind(this)}>
                         <Row className="signup-row">
                             <Col md={6}>
-                                <Form.Control name="firstname" type="text" placeholder={this.state.firstName} autoFocus />
+                                <Form.Control name="firstname" type="text" defaultValue={this.state.firstName} autoFocus />
                             </Col>
                             <Col md={6}>
-                                <Form.Control name="lastname" type="text" placeholder={this.state.lastName} />
+                                <Form.Control name="lastname" type="text" defaultValue={this.state.lastName} />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={6}>
-                                <Form.Control name="email" type="email" placeholder={this.state.emailId} readOnly />
+                                <Form.Control name="email" type="email" defaultValue={this.state.emailId} readOnly />
                             </Col>
                             <Col md={6}>
-                                <Form.Control name="password" type="password" />
+                                <Form.Control name="password" placeholder="<unchanged>" type="password" />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={5}>
-                                <Form.Control name="address" type="text" placeholder={this.state.address} />
+                                <Form.Control name="address" type="text" defaultValue={this.state.address} />
                             </Col>
                             <Col md={3}>
-                                <Form.Control name="city" type="text" placeholder={this.state.city} />
+                                <Form.Control name="city" type="text" defaultValue={this.state.city} />
                             </Col>
                             <Col md={2}>
                                 <Form.Control name="state" value={this.state.state} as="select" >
@@ -160,15 +209,15 @@ class PatientProfile extends Component {
                                 </Form.Control>
                             </Col>
                             <Col md={2}>
-                                <Form.Control name="zipcode" inputMode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" placeholder={this.state.zip} />
+                                <Form.Control name="zipcode" inputMode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" defaultValue={this.state.zip} />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={4}>
-                                <Form.Control name="phoneNumber" type="tel" placeholder={this.state.phone} />
+                                <Form.Control name="phoneNumber" type="tel" defaultValue={this.state.phone} />
                             </Col>
                             <Col md={4}>
-                                <Form.Control name="emergencyContact" type="tel" placeholder={this.state.emergencyContact} />
+                                <Form.Control name="emergencyContact" type="tel" defaultValue={this.state.emergencyContact} />
                             </Col>
                             <Col md={2}>
                                 <Form.Control name="gender" value={this.state.gender} as="select">
@@ -178,7 +227,7 @@ class PatientProfile extends Component {
                                 </Form.Control>
                             </Col>
                             <Col md={2}>
-                                <Form.Control name="age" type="number" min="0" max="150" placeholder={this.state.age} />
+                                <Form.Control name="age" type="number" min="0" max="150" defaultValue={this.state.age} />
                             </Col>
                         </Row>
                         <Row style={{ width: "20%", margin: "0 auto", marginTop: "2vh", marginBottom: "2vh" }}>
@@ -194,10 +243,10 @@ class PatientProfile extends Component {
                             (<Row>
                                 <Col md={3}></Col>
                                 <Col md={3}>
-                                    <Form.Control name="cigsperday" type="number" min="1" max="50" placeholder="Cigarates per day" />
+                                    <Form.Control name="cigsperday" type="number" min="1" max="50" defaultValue="Cigarates per day" />
                                 </Col>
                                 <Col md={3}>
-                                    <Form.Control name="smokeyears" type="number" min="1" max="50" placeholder="Smoking years" />
+                                    <Form.Control name="smokeyears" type="number" min="1" max="50" defaultValue="Smoking years" />
                                 </Col>
                                 <Col md={3}></Col>
                             </Row>) : <Row></Row>

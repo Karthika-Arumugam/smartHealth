@@ -1,6 +1,7 @@
 const express = require("express");
 const Patient = require("../schema/Patient");
 const SimulatedData = require("../schema/SimulatedData");
+const User = require("../schema/User");
 const auth = require("../middleware/auth");
 const { JWT_KEY} = require('../config.js');
 
@@ -21,6 +22,7 @@ router.get('/dashboard', async (req, res) => {
 
     let patient  = await Patient.getDashboard(user.emailId);
     let heartRatesData  = await SimulatedData.getHeartrate(user.emailId);
+    let deviceName  = await User.getDeviceName(user.emailId);
 
     let heartRates = [];
     heartRatesData.forEach(element => {
@@ -30,7 +32,7 @@ router.get('/dashboard', async (req, res) => {
    
 
     let result = JSON.parse(JSON.stringify(patient));
-    result = {...result, heartRates : heartRates };
+    result = {...result, heartRates : heartRates, deviceName : deviceName };
     res.json(result);
 
   } catch (error) {

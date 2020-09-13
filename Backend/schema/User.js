@@ -84,10 +84,37 @@ const userSchema = mongoose.Schema({
 
   },
 
+  deviceName : {
+    type : String,
+    required : false
+  },
+
+  deviceType : {
+    type : String,
+    required : false
+  },
+
   deviceStatus : {
     type : Boolean,
     required : false
+  },
+
+  gender : {
+    type : String,
+    required : false
+  },
+
+  smokingyears : {
+    type : Number,
+    required : false
+  },
+
+  cigperday : {
+    type : Number,
+    required : false
   }
+
+
 });
 
 userSchema.pre("save", async function (next) {
@@ -129,6 +156,17 @@ userSchema.statics.getProfile = async (emailId) => {
   }
 
   return user;
+};
+
+
+userSchema.statics.getDeviceName = async (emailId) => {
+  // Search for a user by email and password.
+  const device = await User.findOne({ emailId }, {deviceName : 1});
+  if (!device) {
+    throw new Error({ error: "Invalid Details" });
+  }
+
+  return device.deviceName;
 };
 
 userSchema.statics.updateProfile = async (req) => {

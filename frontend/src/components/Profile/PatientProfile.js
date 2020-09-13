@@ -90,12 +90,12 @@ class PatientProfile extends Component {
             emergencyContact: emergencyContact.value && emergencyContact.value !== this.state.emergencyContact ? emergencyContact.value : undefined,
             ...(this.state.isSmoker ?
                 {
-                    cigsperday: cigsperday.value,
-                    smokeyears: smokeyears.value
+                    cigperday: cigsperday.value,
+                    smokingyears: smokeyears.value
                 } :
                 {
-                    cigsperday: 0,
-                    smokeyears: 0
+                    cigperday: 0,
+                    smokingyears: 0
                 }
             )
         };
@@ -132,28 +132,35 @@ class PatientProfile extends Component {
                     <Form onSubmit={this.onSubmit.bind(this)}>
                         <Row className="signup-row">
                             <Col md={6}>
+                                <Form.Label >firstname</Form.Label>
                                 <Form.Control name="firstname" type="text" defaultValue={this.state.firstName} autoFocus />
                             </Col>
                             <Col md={6}>
+                                <Form.Label >lastname</Form.Label>
                                 <Form.Control name="lastname" type="text" defaultValue={this.state.lastName} />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={6}>
+                                <Form.Label >Email ID</Form.Label>
                                 <Form.Control name="email" type="email" defaultValue={this.state.emailId} readOnly />
                             </Col>
                             <Col md={6}>
+                                <Form.Label >Password</Form.Label>
                                 <Form.Control name="password" placeholder="<unchanged>" type="password" />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={5}>
+                                <Form.Label >address</Form.Label>
                                 <Form.Control name="address" type="text" defaultValue={this.state.address} />
                             </Col>
                             <Col md={3}>
+                                <Form.Label >city</Form.Label>
                                 <Form.Control name="city" type="text" defaultValue={this.state.city} />
                             </Col>
                             <Col md={2}>
+                                <Form.Label >State</Form.Label>
                                 <Form.Control name="state" value={this.state.state} as="select" >
                                     <option>AL</option>
                                     <option>AK</option>
@@ -209,17 +216,21 @@ class PatientProfile extends Component {
                                 </Form.Control>
                             </Col>
                             <Col md={2}>
+                                <Form.Label >zipcode</Form.Label>
                                 <Form.Control name="zipcode" inputMode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" defaultValue={this.state.zip} />
                             </Col>
                         </Row>
                         <Row className="signup-row">
                             <Col md={4}>
+                                <Form.Label >phoneNumber</Form.Label>
                                 <Form.Control name="phoneNumber" type="tel" defaultValue={this.state.phone} />
                             </Col>
                             <Col md={4}>
+                                <Form.Label >emergencyContact</Form.Label>
                                 <Form.Control name="emergencyContact" type="tel" defaultValue={this.state.emergencyContact} />
                             </Col>
                             <Col md={2}>
+                                <Form.Label >gender</Form.Label>
                                 <Form.Control name="gender" value={this.state.gender} as="select">
                                     <option>Male</option>
                                     <option selected>Female</option>
@@ -227,6 +238,7 @@ class PatientProfile extends Component {
                                 </Form.Control>
                             </Col>
                             <Col md={2}>
+                                <Form.Label >age</Form.Label>
                                 <Form.Control name="age" type="number" min="0" max="150" defaultValue={this.state.age} />
                             </Col>
                         </Row>
@@ -243,9 +255,11 @@ class PatientProfile extends Component {
                             (<Row>
                                 <Col md={3}></Col>
                                 <Col md={3}>
+                                    <Form.Label >cigsperday</Form.Label>
                                     <Form.Control name="cigsperday" type="number" min="1" max="50" defaultValue="Cigarates per day" />
                                 </Col>
                                 <Col md={3}>
+                                    <Form.Label >smokeyears</Form.Label>
                                     <Form.Control name="smokeyears" type="number" min="1" max="50" defaultValue="Smoking years" />
                                 </Col>
                                 <Col md={3}></Col>

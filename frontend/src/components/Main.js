@@ -8,6 +8,7 @@ import Login from './Login/Login';
 import Signup from './Signup/Signup';
 import PatientDashboard from './Dashboard/PatientDashboard';
 import HealthCareDashboard from './Dashboard/HealthCareDashboard';
+import ITAdminDashboard from './Dashboard/ITAdminDashboard'
 import PatientProfile from './Profile/PatientProfile';
 
 class Main extends Component {
@@ -32,6 +33,7 @@ class Main extends Component {
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/patientdash" component={PatientDashboard} />
                 <Route exact path="/healthdash" component={HealthCareDashboard} />
+                <Route exact path="/admindash" component={ITAdminDashboard} />
                 <Route exact path="/patientprof" component={PatientProfile} />
                 <SiteFooter />
             </BrowserRouter>

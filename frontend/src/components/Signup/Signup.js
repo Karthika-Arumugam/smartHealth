@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, ButtonGroup } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, Redirect } from 'react-router-dom';
@@ -12,6 +12,7 @@ class Signup extends Component {
         super(props);
         this.state = {
             isHealthCareProvider: false,
+            userGroup: '',
             message: '',
             isLogin: cookie.load('cookie') || "",
         };
@@ -19,7 +20,18 @@ class Signup extends Component {
 
     onClickHealthCareProviderCheckbox() {
         this.setState({
-            isHealthCareProvider: !this.state.isHealthCareProvider
+            // isHealthCareProvider: !this.state.isHealthCareProvider,
+            userGroup: "Healthcare"
+        });
+    }
+    onClickPatientCheckbox() {
+        this.setState({
+            userGroup: "Patient"
+        });
+    }
+    onClickAdminCheckbox() {
+        this.setState({
+            userGroup: "Admin"
         });
     }
 
@@ -35,18 +47,22 @@ class Signup extends Component {
             city: city.value,
             state: state.value,
             zip: zipcode.value,
-            userGroup: this.state.isHealthCareProvider ? 'Healthcare' : 'Patient',
+            //change this
+            userGroup: this.state.userGroup,
             ...(
-                this.state.isHealthCareProvider ?
+                this.state.userGroup === "Healthcare" ?
                     {
                         healthCareProvider: providerName.value
-                    } :
-                    {
-                        gender: gender.value,
-                        phone: phoneNumber.value,
-                        age: age.value,
-                        emergencyContact: emergencyContact.value,
-                    }
+                    } : this.state.userGroup === "Patient" ?
+                        {
+                            gender: gender.value,
+                            phone: phoneNumber.value,
+                            age: age.value,
+                            emergencyContact: emergencyContact.value,
+                        } : this.state.userGroup === "Admin" ?
+                            {
+                                phone: phoneNumber.value
+                            } : {}
             )
         };
         const sleep = msec => new Promise(r => setTimeout(r, msec));
@@ -65,7 +81,7 @@ class Signup extends Component {
             await sleep(2000);
             if (response.status === 201) {
                 this.setState({ message: response.status === 201 ? 'account created successfully! please login to continue...' : body.message });
-            }
+            } else this.setState({ message: body.errmsg })
         } catch (e) {
             await sleep(2000);
             this.setState({ message: e.message || e });
@@ -78,13 +94,11 @@ class Signup extends Component {
                 {this.state.isLogin ? <Redirect to="/patientdash" /> : ""}
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Create Account</h2>
                 <Row style={{ width: "20%", margin: "0 auto", marginTop: "2vh", marginBottom: "2vh" }}>
-                    <Form.Check
-                        type="switch"
-                        id="custom-switch"
-                        label="Health Care Provider?"
-                        checked={this.state.isHealthCareProvider}
-                        onClick={this.onClickHealthCareProviderCheckbox.bind(this)}
-                    />
+                    <ButtonGroup aria-label="Basic example" >
+                        <Button variant="info" onClick={this.onClickPatientCheckbox.bind(this)}>Patient</Button>
+                        <Button variant="info" onClick={this.onClickHealthCareProviderCheckbox.bind(this)}>Healthcare</Button>
+                        <Button variant="info" onClick={this.onClickAdminCheckbox.bind(this)}>Admin</Button>
+                    </ButtonGroup>
                 </Row>
                 <Container style={{ width: "80%", margin: "0 auto" }}>
                     <Form onSubmit={this.onSubmit.bind(this)}>
@@ -170,32 +184,47 @@ class Signup extends Component {
                                 <Form.Control name="zipcode" type="text" inputmode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$" placeholder="Zip" required />
                             </Col>
                         </Row>
-                        {this.state.isHealthCareProvider ?
-                            (<Row>
-                                <Col md={3}></Col>
-                                <Col md={6}>
-                                    <Form.Control name="providerName" type="text" placeholder="Provider name" required />
-                                </Col>
-                                <Col md={3}></Col>
-                            </Row>) :
-                            (<Row className="signup-row">
-                                <Col md={4}>
-                                    <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
-                                </Col>
-                                <Col md={4}>
-                                    <Form.Control name="emergencyContact" type="tel" placeholder="Emergency Contact" required />
-                                </Col>
-                                <Col md={2}>
-                                    <Form.Control name="gender" as="select" required>
-                                        <option>Male</option>
-                                        <option selected>Female</option>
-                                        <option>Other</option>
-                                    </Form.Control>
-                                </Col>
-                                <Col md={2}>
-                                    <Form.Control name="age" type="number" min="0" max="150" placeholder="Age" required />
-                                </Col>
-                            </Row>)
+                        {this.state.userGroup === "Healthcare" ?
+                            (
+                                <Row>
+                                    <Col md={3}></Col>
+                                    <Col md={6}>
+                                        <Form.Control name="providerName" type="text" placeholder="Provider name" required />
+                                    </Col>
+                                    <Col md={3}></Col>
+                                </Row>
+                            ) : (
+                                this.state.userGroup === "Patient" ?
+                                    (
+                                        <Row className="signup-row">
+                                            <Col md={4}>
+                                                <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
+                                            </Col>
+                                            <Col md={4}>
+                                                <Form.Control name="emergencyContact" type="tel" placeholder="Emergency Contact" required />
+                                            </Col>
+                                            <Col md={2}>
+                                                <Form.Control name="gender" as="select" required>
+                                                    <option>Male</option>
+                                                    <option selected>Female</option>
+                                                    <option>Other</option>
+                                                </Form.Control>
+                                            </Col>
+                                            <Col md={2}>
+                                                <Form.Control name="age" type="number" min="0" max="150" placeholder="Age" required />
+                                            </Col>
+                                        </Row>
+                                    ) :
+                                    (
+                                        <Row className="signup-row">
+                                            <Col md={4}></Col>
+                                            <Col md={4}>
+                                                <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
+                                            </Col>
+                                            <Col md={4}></Col>
+                                        </Row>
+                                    )
+                            )
                         }
                         <Button variant="info" type="submit" style={{ marginRight: "3vw" }}>Register</Button>
                         <Link to="/login">Already a member Login here</Link>

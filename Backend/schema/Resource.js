@@ -13,9 +13,14 @@ const resourceSchema = mongoose.Schema({
     required: true
   },
 
-  available : {
+  totalCount : {
     type : Number,
     required: true
+  },
+
+  available : {
+    type : Number,
+    required: false
   },
 
   owner : {

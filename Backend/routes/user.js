@@ -15,8 +15,10 @@ router.post('/signup', async (req, res) => {
     await user.save();
     // const token = await user.generateAuthToken();
 
-    const patient = new Patient({emailId : req.body.emailId,  riskStatus: 0,  time : new Date()});
-    await patient.save();
+    if(req.body.userGroup == "Patient")  {
+      const patient = new Patient({emailId : req.body.emailId,  riskStatus: 0,  time : new Date()});
+      await patient.save();
+    }
 
     
     res.status(201).send( user );
@@ -126,51 +128,6 @@ router.post("/profile", async (req, res) => {
   }
 });
 
-router.post("/activateDevice", async (req, res) => {
 
-  if (!(req.cookies.cookie)) {
-    return res.status(401).json({ message: "You are not logged in,please login to continue" });
-  }
-  // update user profile
-  try {
-
-    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
-
-    user = await User.activateDevice(user.emailId);
-
-    if(!user)
-      return res.status(400).json({ message: "Invalid credentials"});
-
-    if(user)
-      res.json({"deviceStatus" : true});
-    else
-      res.json({"deviceStatus" : false});
-  } catch (error) {
-    res.status(400).send({ message: "Server error! Unable to activate device"});
-  }
-});
-
-router.post("/deactivateDevice", async (req, res) => {
-
-  if (!(req.cookies.cookie)) {
-    return res.status(401).json({ message: "You are not logged in,please login to continue" });
-  }
-  // update user profile
-  try {
-
-    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
-    user = await User.deactivateDevice(user.emailId);
-
-    if(!user)
-      return res.status(400).json({ message: "Invalid credentials"});
-
-    if(user)
-      res.json({"deviceStatus" : false});
-    else
-      res.json({"deviceStatus" : true});
-  } catch (error) {
-    res.status(500).send({ message: "Server error! Unable to deactivate device"});
-  }
-});
 
 module.exports = router;

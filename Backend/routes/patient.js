@@ -61,5 +61,72 @@ router.put('/riskStatus', async (req, res) => {
 });
 
 
+router.post("/activateDevice", async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+  // update user profile
+  try {
+
+    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
+
+    user = await Patient.activateDevice(user.emailId);
+
+    if(!user)
+      return res.status(400).json({ message: "Invalid credentials"});
+
+    if(user)
+      res.json({"deviceStatus" : true});
+    else
+      res.json({"deviceStatus" : false});
+  } catch (error) {
+    res.status(400).send({ message: "Server error! Unable to activate device"});
+  }
+});
+
+router.post("/deactivateDevice", async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+  // update user profile
+  try {
+
+    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
+    user = await Patient.deactivateDevice(user.emailId);
+
+    if(!user)
+      return res.status(400).json({ message: "Invalid credentials"});
+
+    if(user)
+      res.json({"deviceStatus" : false});
+    else
+      res.json({"deviceStatus" : true});
+  } catch (error) {
+    res.status(500).send({ message: "Server error! Unable to deactivate device"});
+  }
+});
+
+
+router.get("/activeDeviceCount", async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+ 
+  try {
+    const result = await Patient.activeDevicesCount(req);
+
+    if(!result)
+      return res.status(400).json({ message: "Invalid details"});
+
+  res.json(result);
+  } catch (error) {
+    res.status(400).send({ message: "Server error! Unable to get active devices count"});
+  }
+});
+
+
 
 module.exports = router;

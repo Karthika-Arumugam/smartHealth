@@ -108,7 +108,23 @@ const patientSchema = mongoose.Schema({
         required: false
       }
     }
-  ]
+  ],
+
+  deviceName : {
+    type : String,
+    required : false
+  },
+
+  deviceType : {
+    type : String,
+    required : false
+  },
+
+  deviceStatus : {
+    type : Boolean,
+    required : true,
+    default : false
+  } 
 });
 
 patientSchema.pre("save", async function (next) {
@@ -157,6 +173,64 @@ const doc = await patient.save();
 
  return doc;
 };
+
+
+
+patientSchema.statics.activateDevice = async (emailId) => {
+  
+
+  const result =  await Patient.findOne({'emailId' : emailId });
+
+  if(!result)
+    throw new Error({ error: "Invalid input details" });
+
+  var set = {
+      deviceStatus : true
+  }
+  
+  result.set(set);
+  const patient = await result.save();
+
+  if(!patient)
+    throw new Error({ error: "unable to activate device" });
+  
+    return patient;
+
+};
+
+patientSchema.statics.deactivateDevice = async (emailId) => {
+
+const result =  await Patient.findOne({'emailId' : emailId });
+
+if(!result)
+  throw new Error({ error: "Invalid input details" });
+
+var set = {
+    deviceStatus : false
+}
+
+result.set(set);
+const patient = await result.save();
+
+if(!patient)
+  throw new Error({ error: "unable to deactivate device" });
+
+  return patient;
+
+};
+
+patientSchema.statics.activeDevicesCount = async (req) => {
+
+  console.log("start")
+
+  const result =  await Patient.countDocuments({ deviceStatus : true});
+  
+  if(!result)
+    throw new Error({ error: "Invalid input details" });
+
+  return result;
+  
+  };
 
 const Patient = mongoose.model("Patient", patientSchema, "Patient");
 

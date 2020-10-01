@@ -76,7 +76,6 @@ class Login extends Component {
     render() {
         return (
             <Container className="parlex-back-login">
-                {/* TO ADD IT ADMIN CONDITION */}
                 {this.state.authFlag && this.state.usergroup === 'Patient' ? <Redirect to="/patientdash" /> : this.state.authFlag && this.state.usergroup === 'Healthcare' ? <Redirect to="/healthdash" /> : this.state.authFlag && this.state.usergroup === 'Admin' ? <Redirect to="/admindash" /> : ""}
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
                 <Form onSubmit={this.submitLogin}>

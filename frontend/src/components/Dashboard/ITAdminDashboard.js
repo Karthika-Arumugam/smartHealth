@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, Table, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Table, Button, Badge } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HighchartsReact from 'highcharts-react-official';
@@ -10,6 +10,7 @@ import cookie from 'react-cookies';
 import Highcharts from "highcharts/highcharts.js";
 import highchartsMore from "highcharts/highcharts-more.js";
 import solidGauge from "highcharts/modules/solid-gauge.js";
+import { Link } from 'react-router-dom';
 highchartsMore(Highcharts);
 solidGauge(Highcharts);
 highcharts3d(Highcharts);
@@ -70,14 +71,16 @@ class ITAdminDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            resources: [],
+            resources: []
         }
     }
     async componentDidMount() {
         try {
             const authToken = cookie.load('cookie') || '';
             if (authToken) {
+
                 //Call Admin dashboard APIs
+                //Add .then .then and handle all calls
                 const response = await fetch(`/api/v1/resource/all`, {
                     method: 'get',
                     mode: "cors",
@@ -86,7 +89,7 @@ class ITAdminDashboard extends Component {
                         'content-type': 'application/json',
                         'Authorization': authToken
                     },
-                });
+                })
                 const body = await response.json();
                 if (response.status === 200) {
                     if (body) {
@@ -96,7 +99,40 @@ class ITAdminDashboard extends Component {
                         })
                     }
                 }
-                this.setState({ message: response.status === 200 ? 'account created successfully! please login to continue...' : body.message });
+                this.setState({ message: response.status === 200 ? 'Success' : body.message });
+                const throughput = await fetch('/api/v1/statistics/efficiency', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                const throughputbody = await throughput.json();
+                if (throughputbody) {
+                    this.setState({
+                        avgallocation: throughputbody * 100
+                    })
+                }
+                //avg response time graph
+                //api/v1/statistics/avgResponseTime
+                const avgresbody = await fetch('/api/v1/statistics/avgResponseTime', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                let avgres = await avgresbody.json();
+                if (avgres) {
+                    const num = (avgres * 100).toFixed(2);
+                    this.setState({
+                        avgResponseTime: num
+                    })
+                }
             }
         }
         catch (e) {
@@ -105,7 +141,6 @@ class ITAdminDashboard extends Component {
     }
 
     render() {
-
         const allocstatus = {
             chart: {
                 type: 'solidgauge',
@@ -210,13 +245,12 @@ class ITAdminDashboard extends Component {
                 }]
             }]
         };
-
         const allocationgauge = {
             chart: {
                 type: "solidgauge"
             },
             title: {
-                text: 'Allocations per min'
+                text: 'Average Allocations %'
             },
             pane: {
                 center: ['50%', '85%'],
@@ -231,21 +265,18 @@ class ITAdminDashboard extends Component {
                     shape: 'arc'
                 }
             },
-
             exporting: {
                 enabled: false
             },
-
             tooltip: {
                 enabled: false
             },
-
             // the value axis
             yAxis: {
                 stops: [
-                    [0.10, '#55BF3B'], // green
+                    [0.10, '#DF5353'], // red
                     [0.50, '#DDDF0D'], // yellow
-                    [0.70, '#DF5353'] // red
+                    [0.70, '#55BF3B'] // green   
                 ],
                 lineWidth: 0,
                 tickWidth: 0,
@@ -260,7 +291,7 @@ class ITAdminDashboard extends Component {
                 min: 0,
                 max: 100,
                 title: {
-                    text: 'Allocations per min'
+                    text: 'Avg Allocation %'
                 }
             },
 
@@ -270,16 +301,16 @@ class ITAdminDashboard extends Component {
 
             series: [{
                 name: 'Resource Allocation Response Time',
-                data: [50],
+                data: [this.state.avgallocation],
                 dataLabels: {
                     format:
                         '<div style="text-align:center">' +
                         '<span style="font-size:25px">{y}</span><br/>' +
-                        '<span style="font-size:12px;opacity:0.4">Allocations</span>' +
+                        '<span style="font-size:12px;opacity:0.4">% allocations</span>' +
                         '</div>'
                 },
                 tooltip: {
-                    valueSuffix: ' Allocations'
+                    valueSuffix: ' Avg allocations %'
                 }
             }]
 
@@ -342,7 +373,7 @@ class ITAdminDashboard extends Component {
             },
             series: [{
                 name: 'Average response time',
-                data: [30],
+                data: [this.state.avgResponseTime],
                 dataLabels: {
                     format:
                         '<div style="text-align:center">' +
@@ -439,7 +470,7 @@ class ITAdminDashboard extends Component {
                         <td>{key.healthcareProvider}</td>
                         <td>{key.owner}</td>
                         <td>{dateString}</td>
-                        <td><Badge variant="success">Manage</Badge></td>
+                        <td><Link to={`/resource`}><Button variant="warning" >Manage</Button></Link></td>
                     </tr>
                 )
             }
@@ -506,7 +537,9 @@ class ITAdminDashboard extends Component {
             );
         }
         return (
+
             <Container>
+
                 <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
                     <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
                 </div>
@@ -537,24 +570,6 @@ class ITAdminDashboard extends Component {
                         </thead>
                         <tbody>
                             {getTableEntries()}
-                            {/* <tr>
-
-                                <td>1</td>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>@mdo</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Jacob</td>
-                                <td>Thornton</td>
-                                <td>@fat</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td colSpan="2">Larry the Bird</td>
-                                <td>@twitter</td>
-                            </tr> */}
                         </tbody>
                     </Table>
                 </Row>

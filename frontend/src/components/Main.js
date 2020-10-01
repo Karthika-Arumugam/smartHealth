@@ -10,6 +10,7 @@ import PatientDashboard from './Dashboard/PatientDashboard';
 import HealthCareDashboard from './Dashboard/HealthCareDashboard';
 import ITAdminDashboard from './Dashboard/ITAdminDashboard'
 import PatientProfile from './Profile/PatientProfile';
+import Resource from './Resource/Resource'
 
 class Main extends Component {
     constructor(props) {
@@ -35,6 +36,7 @@ class Main extends Component {
                 <Route exact path="/healthdash" component={HealthCareDashboard} />
                 <Route exact path="/admindash" component={ITAdminDashboard} />
                 <Route exact path="/patientprof" component={PatientProfile} />
+                <Route exact path="/resource" component={Resource} />
                 <SiteFooter />
             </BrowserRouter>
         )

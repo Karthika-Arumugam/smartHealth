@@ -12,6 +12,7 @@ var patientRouter = require('./routes/patient');
 var simulatorRouter = require('./routes/simulatedData');
 var resourceRouter = require('./routes/resource');
 var resourceAllocationRouter = require('./routes/resourceAllocation');
+var statisticsRouter = require('./routes/statistics');
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,6 +35,7 @@ app.use(`/api/${apiVersion}/patient`, patientRouter);
 app.use(`/api/${apiVersion}/simulator`, simulatorRouter);
 app.use(`/api/${apiVersion}/resource`, resourceRouter);
 app.use(`/api/${apiVersion}/resourceAllocation`, resourceAllocationRouter);
+app.use(`/api/${apiVersion}/statistics`, statisticsRouter);
 
 
 // catch 404 and forward to error handler

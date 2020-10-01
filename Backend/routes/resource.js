@@ -91,6 +91,22 @@ router.delete('/delete', async (req, res) => {
         res.status(400).send({ message: "Invalid resource details"});
       }
   });
+
+  router.get('/aggregatedInfo', async (req, res) => {
+    // if (!(req.cookies.cookie)) {
+    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    //   }
+      // get all resources
+      let resource,result;
+      try {
+        resource  = await Resource.aggregatedInfo(req.body);
+        result = JSON.parse(JSON.stringify(resource));
+        res.json(result);
+
+      } catch (error) {
+        res.status(400).send({ message: "Invalid resource details"});
+      }
+  });
   
 
 module.exports = router;

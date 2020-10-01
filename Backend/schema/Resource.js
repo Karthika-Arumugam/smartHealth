@@ -124,6 +124,26 @@ resourceSchema.statics.update = async (req) => {
 
   };
 
+
+  resourceSchema.statics.aggregatedInfo = async (req) => {
+    // get available resources  aggregated count
+
+    const result =  await  Resource.aggregate([
+      {
+         "$group": {
+            "_id":  "$type" ,
+            "totalCount": { $sum: "$available" }
+     } 
+}        
+         
+   ]);
+    
+    if (!result) {
+      throw new Error({ error: "Invalid resource details" });
+    }
+   return result;
+  };
+
 const Resource = mongoose.model("Resource", resourceSchema, "Resource");
 
 module.exports = Resource;

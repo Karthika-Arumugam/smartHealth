@@ -42,4 +42,21 @@ router.post('/deallocate', async (req, res) => {
   });
 
 
+  router.get('/allocationInfo', async (req, res) => {
+    // if (!(req.cookies.cookie)) {
+    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    //   }
+      // get all resources
+      let resource,result;
+      try {
+        resource  = await ResourceAllocation.allocatedResourceInfo(req.body);
+        result = JSON.parse(JSON.stringify(resource));
+        res.json(result);
+
+      } catch (error) {
+        res.status(400).send({ message: "Invalid resource details"});
+      }
+  });
+
+
 module.exports = router;

@@ -79,6 +79,32 @@ class ITAdminDashboard extends Component {
             const authToken = cookie.load('cookie') || '';
             if (authToken) {
 
+                //call active device counts
+                fetch('api/v1/patient/activeDeviceCount', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(async function (response) {
+                    const body = await response.json();
+                    return { status: response.status, body };
+                }).then(async response => {
+                    if (response.status === 200) {
+                        console.log(response.body)
+                        this.setState({
+                            deviceCount: response.body,
+                        });
+                    } else {
+                        this.setState({
+                            msg: body.message
+                        })
+                    }
+                }).catch(async err => {
+                    console.log(err)
+                });
+
                 //Call Admin dashboard APIs
                 //Add .then .then and handle all calls
                 const response = await fetch(`/api/v1/resource/all`, {
@@ -93,7 +119,6 @@ class ITAdminDashboard extends Component {
                 const body = await response.json();
                 if (response.status === 200) {
                     if (body) {
-                        console.log(body);
                         this.setState({
                             resources: body
                         })
@@ -129,9 +154,11 @@ class ITAdminDashboard extends Component {
                 let avgres = await avgresbody.json();
                 if (avgres) {
                     const num = (avgres * 100).toFixed(2);
+
                     this.setState({
                         avgResponseTime: num
                     })
+                    console.log(this.state.avgResponseTime)
                 }
             }
         }
@@ -282,23 +309,21 @@ class ITAdminDashboard extends Component {
                 tickWidth: 0,
                 minorTickInterval: null,
                 tickAmount: 2,
-                title: {
-                    y: -70
-                },
+
                 labels: {
                     y: 16
                 },
                 min: 0,
                 max: 100,
                 title: {
+                    y: -70,
                     text: 'Avg Allocation %'
+
                 }
             },
-
             credits: {
                 enabled: false
             },
-
             series: [{
                 name: 'Resource Allocation Response Time',
                 data: [this.state.avgallocation],
@@ -313,8 +338,6 @@ class ITAdminDashboard extends Component {
                     valueSuffix: ' Avg allocations %'
                 }
             }]
-
-
         }
         const waitgauge = {
             chart: {
@@ -336,15 +359,12 @@ class ITAdminDashboard extends Component {
                     shape: 'arc'
                 }
             },
-
             exporting: {
                 enabled: false
             },
-
             tooltip: {
                 enabled: false
             },
-
             // the value axis
             yAxis: {
                 stops: [
@@ -356,16 +376,14 @@ class ITAdminDashboard extends Component {
                 tickWidth: 0,
                 minorTickInterval: null,
                 tickAmount: 2,
-                title: {
-                    y: -70
-                },
                 labels: {
                     y: 16
                 },
                 min: 0,
                 max: 100,
                 title: {
-                    text: 'Average response time'
+                    // text: 'Avg % response',
+                    y: -70
                 }
             },
             credits: {
@@ -373,20 +391,18 @@ class ITAdminDashboard extends Component {
             },
             series: [{
                 name: 'Average response time',
-                data: [this.state.avgResponseTime],
+                data: [parseFloat(this.state.avgResponseTime)],
                 dataLabels: {
                     format:
                         '<div style="text-align:center">' +
                         '<span style="font-size:25px">{y}</span><br/>' +
-                        '<span style="font-size:12px;opacity:0.4">sec</span>' +
+                        '<span style="font-size:12px;opacity:0.4">% response within SLA</span>' +
                         '</div>'
                 },
                 tooltip: {
                     valueSuffix: ' Average wait time'
                 }
             }]
-
-
         }
         const lineAlloc = {
             title: {
@@ -457,13 +473,11 @@ class ITAdminDashboard extends Component {
         }
         const getTableEntries = () => {
             // const isAllocated = Math.floor(Math.random() * 2) === 0 ? "success" : "danger";
-            console.log("inside gettable");
+
             const xx = [];
             for (let key of this.state.resources) {
                 const datealloc = new Date(key.createdDate)
                 const dateString = datealloc.toLocaleDateString()
-
-                console.log(dateString)
                 xx.push(
                     <tr>
                         <td>{key.type}</td>
@@ -544,7 +558,7 @@ class ITAdminDashboard extends Component {
                     <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
                 </div>
                 <Row>
-                    <Col><h1><Badge variant="info">Activated Devices<br></br><br></br>40<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                    <Col><h1><Badge variant="info">Active Devices<br></br><br></br>{this.state.deviceCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
                 </Row>
                 <Row >
                     <Col><HighchartsReact highcharts={Highcharts} options={allocstatus} /></Col>

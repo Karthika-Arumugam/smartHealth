@@ -53,16 +53,16 @@ const ResourcePie = {
         type: 'pie',
         name: 'Resource Availability Percent',
         data: [
-            ['Ambulance', 45.0],
+            ['Ambulance', 40.0],
             ['Cardiologist', 26.8],
             {
-                name: 'Specialist',
+                name: 'Monitoring',
                 y: 12.8,
                 sliced: true,
                 selected: true
             },
-            ['Emergency', 8.5],
-            ['Devices', 7.1]
+            ['Medical Prescription', 7.1],
+            ['Equipment', 5.0]
         ]
     }]
 }
@@ -76,7 +76,7 @@ class ITAdminDashboard extends Component {
         this.getResourceCount = this.getResourceCount.bind(this);
     }
     getResourceCount = () => {
-        const ambulance = {}, emergency = {}, prescription = {}, monitoring = {}, cardiologist = {}, equipment = {};
+        const ambulance = {}, prescription = {}, monitoring = {}, cardiologist = {}, equipment = {};
         //create recource type obj as {10/10/2020:3,10/11/2020:4} date:count
         for (let key of this.state.resources) {
             const datealloc = new Date(key.createdDate)
@@ -84,9 +84,6 @@ class ITAdminDashboard extends Component {
             switch (key.type) {
                 case ('Ambulance'):
                     ambulance[dateString] = ambulance[dateString] ? ambulance[dateString] + 1 : 1;
-                    break;
-                case ('Emergency'):
-                    emergency[dateString] = emergency[dateString] ? emergency[dateString] + 1 : 1;
                     break;
                 case ("Medical Prescription"):
                     prescription[dateString] = prescription[dateString] ? prescription[dateString] + 1 : 1;
@@ -112,15 +109,7 @@ class ITAdminDashboard extends Component {
         }
         this.setState({ ambulanceDataChart: ambulanceData });
 
-        //2. Emergency Chart Data
-        const emergencyData = [];
-        for (let key in emergency) {
-            let d = new Date(key);
-            emergencyData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), emergency[key]]);
-        }
-        this.setState({ emergencyDataChart: emergencyData });
-
-        //3. Cardiologist Chart Data
+        //2. Cardiologist Chart Data
         const cardiologistData = [];
         for (let key in cardiologist) {
             let d = new Date(key);
@@ -128,7 +117,7 @@ class ITAdminDashboard extends Component {
         }
         this.setState({ cardiologistDataChart: cardiologistData });
 
-        //4. prescription Chart Data
+        //3. prescription Chart Data
         const prescriptionData = [];
         for (let key in prescription) {
             let d = new Date(key);
@@ -136,7 +125,7 @@ class ITAdminDashboard extends Component {
         }
         this.setState({ prescriptionDataChart: prescriptionData });
 
-        //5. monitoring Chart Data
+        //4. monitoring Chart Data
         const monitoringData = [];
         for (let key in prescription) {
             let d = new Date(key);
@@ -144,7 +133,7 @@ class ITAdminDashboard extends Component {
         }
         this.setState({ monitoringDataChart: monitoringData });
 
-        //6. equipment
+        //5. Equipment Chart Data
         const equipmentData = [];
         for (let key in equipment) {
             let d = new Date(key);
@@ -534,9 +523,6 @@ class ITAdminDashboard extends Component {
                 name: 'Cardiologist',
                 data: this.state.cardiologistDataChart
             }, {
-                name: 'Emergency',
-                data: this.state.emergencyDataChart
-            }, {
                 name: "Medical Prescription",
                 data: this.state.prescriptionDataChart
             }, {
@@ -572,7 +558,7 @@ class ITAdminDashboard extends Component {
                         <td>{key.healthcareProvider}</td>
                         <td>{key.owner}</td>
                         <td>{dateString}</td>
-                        <td><Link to={`/resource`}><Button variant="info" >Manage</Button></Link></td>
+                        <td><Link to={`/resource/${key.healthcareProvider}`}><Button variant="info" >Manage</Button></Link></td>
                     </tr>
                 )
             }

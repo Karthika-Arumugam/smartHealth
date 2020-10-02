@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Table, Button, Badge } from 'react-bootstrap';
-import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
+import { faHeartbeat, faTable } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HighchartsReact from 'highcharts-react-official';
 import highcharts3d from 'highcharts/highcharts-3d'
@@ -73,10 +73,90 @@ class ITAdminDashboard extends Component {
         this.state = {
             resources: []
         }
+        this.getResourceCount = this.getResourceCount.bind(this);
     }
+    getResourceCount = () => {
+        const ambulance = {}, emergency = {}, prescription = {}, monitoring = {}, cardiologist = {}, equipment = {};
+        //create recource type obj as {10/10/2020:3,10/11/2020:4} date:count
+        for (let key of this.state.resources) {
+            const datealloc = new Date(key.createdDate)
+            const dateString = datealloc.toLocaleDateString()
+            switch (key.type) {
+                case ('Ambulance'):
+                    ambulance[dateString] = ambulance[dateString] ? ambulance[dateString] + 1 : 1;
+                    break;
+                case ('Emergency'):
+                    emergency[dateString] = emergency[dateString] ? emergency[dateString] + 1 : 1;
+                    break;
+                case ("Medical Prescription"):
+                    prescription[dateString] = prescription[dateString] ? prescription[dateString] + 1 : 1;
+                    break;
+                case ('Monitoring'):
+                    monitoring[dateString] = monitoring[dateString] ? monitoring[dateString] + 1 : 1;
+                    break;
+                case ('Cardiologist'):
+                    cardiologist[dateString] = cardiologist[dateString] ? cardiologist[dateString] + 1 : 1;
+                    break;
+                case ('Equipment'):
+                    equipment[dateString] = equipment[dateString] ? equipment[dateString] + 1 : 1;
+                    break;
+            }
+        }
+        // convert date : count to below format for each type
+        //data: [[Date.UTC(2013, 11, 31), 43], [Date.UTC(2013, 11, 30), 52], [Date.UTC(2013, 11, 29), 57]]
+        //1. Ambulance Chart Data
+        const ambulanceData = [];
+        for (let key in ambulance) {
+            let d = new Date(key);
+            ambulanceData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), ambulance[key]]);
+        }
+        this.setState({ ambulanceDataChart: ambulanceData });
+
+        //2. Emergency Chart Data
+        const emergencyData = [];
+        for (let key in emergency) {
+            let d = new Date(key);
+            emergencyData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), emergency[key]]);
+        }
+        this.setState({ emergencyDataChart: emergencyData });
+
+        //3. Cardiologist Chart Data
+        const cardiologistData = [];
+        for (let key in cardiologist) {
+            let d = new Date(key);
+            cardiologistData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), cardiologist[key]]);
+        }
+        this.setState({ cardiologistDataChart: cardiologistData });
+
+        //4. prescription Chart Data
+        const prescriptionData = [];
+        for (let key in prescription) {
+            let d = new Date(key);
+            prescriptionData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), prescription[key]]);
+        }
+        this.setState({ prescriptionDataChart: prescriptionData });
+
+        //5. monitoring Chart Data
+        const monitoringData = [];
+        for (let key in prescription) {
+            let d = new Date(key);
+            monitoringData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), monitoring[key]]);
+        }
+        this.setState({ monitoringDataChart: monitoringData });
+
+        //6. equipment
+        const equipmentData = [];
+        for (let key in equipment) {
+            let d = new Date(key);
+            equipmentData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), monitoring[key]]);
+        }
+        this.setState({ equipmentDataChart: equipmentData });
+    };
+
     async componentDidMount() {
         try {
             const authToken = cookie.load('cookie') || '';
+
             if (authToken) {
 
                 //call active device counts
@@ -92,7 +172,7 @@ class ITAdminDashboard extends Component {
                     return { status: response.status, body };
                 }).then(async response => {
                     if (response.status === 200) {
-                        console.log(response.body)
+
                         this.setState({
                             deviceCount: response.body,
                         });
@@ -106,7 +186,6 @@ class ITAdminDashboard extends Component {
                 });
 
                 //Call Admin dashboard APIs
-                //Add .then .then and handle all calls
                 const response = await fetch(`/api/v1/resource/all`, {
                     method: 'get',
                     mode: "cors",
@@ -125,6 +204,8 @@ class ITAdminDashboard extends Component {
                     }
                 }
                 this.setState({ message: response.status === 200 ? 'Success' : body.message });
+                //count the resources allocated each day
+                this.getResourceCount();
                 const throughput = await fetch('/api/v1/statistics/efficiency', {
                     method: 'get',
                     mode: "cors",
@@ -141,7 +222,6 @@ class ITAdminDashboard extends Component {
                     })
                 }
                 //avg response time graph
-                //api/v1/statistics/avgResponseTime
                 const avgresbody = await fetch('/api/v1/statistics/avgResponseTime', {
                     method: 'get',
                     mode: "cors",
@@ -154,11 +234,9 @@ class ITAdminDashboard extends Component {
                 let avgres = await avgresbody.json();
                 if (avgres) {
                     const num = (avgres * 100).toFixed(2);
-
                     this.setState({
                         avgResponseTime: num
                     })
-                    console.log(this.state.avgResponseTime)
                 }
             }
         }
@@ -166,7 +244,6 @@ class ITAdminDashboard extends Component {
             this.setState({ message: e.message || e });
         }
     }
-
     render() {
         const allocstatus = {
             chart: {
@@ -176,14 +253,12 @@ class ITAdminDashboard extends Component {
                     render: renderIcons
                 }
             },
-
             title: {
-                text: 'Activity',
+                text: 'Track Resource Allocation by Status',
                 style: {
                     fontSize: '24px'
                 }
             },
-
             tooltip: {
                 borderWidth: 0,
                 backgroundColor: 'none',
@@ -200,7 +275,6 @@ class ITAdminDashboard extends Component {
                     };
                 }
             },
-
             pane: {
                 startAngle: 0,
                 endAngle: 360,
@@ -227,14 +301,12 @@ class ITAdminDashboard extends Component {
                     borderWidth: 0
                 }]
             },
-
             yAxis: {
                 min: 0,
                 max: 100,
                 lineWidth: 0,
                 tickPositions: []
             },
-
             plotOptions: {
                 solidgauge: {
                     dataLabels: {
@@ -245,7 +317,6 @@ class ITAdminDashboard extends Component {
                     rounded: true
                 }
             },
-
             series: [{
                 name: 'Move',
                 data: [{
@@ -277,7 +348,15 @@ class ITAdminDashboard extends Component {
                 type: "solidgauge"
             },
             title: {
-                text: 'Average Allocations %'
+                text: 'Average Allocations %',
+                style: {
+                    fontSize: '24px'
+                }
+            },
+            subtitle: {
+                text: '% allocation done per request received'
+            }, credits: {
+                enabled: false
             },
             pane: {
                 center: ['50%', '85%'],
@@ -344,7 +423,15 @@ class ITAdminDashboard extends Component {
                 type: "solidgauge"
             },
             title: {
-                text: 'Average response time'
+                text: 'Average response time',
+                style: {
+                    fontSize: '24px'
+                }
+            },
+            subtitle: {
+                text: '% response time within SLA(5 mins)'
+            }, credits: {
+                enabled: false
             },
             pane: {
                 center: ['50%', '85%'],
@@ -408,31 +495,30 @@ class ITAdminDashboard extends Component {
             title: {
                 text: 'Resource Allocation Details by Resource Type'
             },
-
             subtitle: {
                 text: 'Dynamic Resource Allocation Count'
             }, credits: {
                 enabled: false
             },
-
             yAxis: {
                 title: {
                     text: 'Number of Allocations'
                 }
             },
-
             xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%e %b'
+                },
                 accessibility: {
-                    rangeDescription: 'Range: 2010 to 2017'
+                    rangeDescription: 'Range: 2019 to 2020'
                 }
             },
-
             legend: {
                 layout: 'vertical',
                 align: 'center',
                 verticalAlign: 'bottom'
             },
-
             plotOptions: {
                 series: {
                     label: {
@@ -441,21 +527,25 @@ class ITAdminDashboard extends Component {
                     pointStart: 20
                 }
             },
-
             series: [{
                 name: 'Ambulance',
-                data: [43, 52, 57, 69, 97, 119, 137, 154]
+                data: this.state.ambulanceDataChart
             }, {
                 name: 'Cardiologist',
-                data: [24, 24, 29, 29, 32, 30, 38, 40]
+                data: this.state.cardiologistDataChart
             }, {
                 name: 'Emergency',
-                data: [11, 17, 16, 19, 20, 24, 32, 39]
+                data: this.state.emergencyDataChart
             }, {
-                name: 'Devices',
-                data: [null, null, 5, 12, 15, 22, 34, 34]
+                name: "Medical Prescription",
+                data: this.state.prescriptionDataChart
+            }, {
+                name: 'Monitoring',
+                data: this.state.monitoringDataChart
+            }, {
+                name: 'Equipment',
+                data: this.state.equipmentDataChart
             }],
-
             responsive: {
                 rules: [{
                     condition: {
@@ -472,8 +562,6 @@ class ITAdminDashboard extends Component {
             }
         }
         const getTableEntries = () => {
-            // const isAllocated = Math.floor(Math.random() * 2) === 0 ? "success" : "danger";
-
             const xx = [];
             for (let key of this.state.resources) {
                 const datealloc = new Date(key.createdDate)
@@ -484,7 +572,7 @@ class ITAdminDashboard extends Component {
                         <td>{key.healthcareProvider}</td>
                         <td>{key.owner}</td>
                         <td>{dateString}</td>
-                        <td><Link to={`/resource`}><Button variant="warning" >Manage</Button></Link></td>
+                        <td><Link to={`/resource`}><Button variant="info" >Manage</Button></Link></td>
                     </tr>
                 )
             }
@@ -551,9 +639,7 @@ class ITAdminDashboard extends Component {
             );
         }
         return (
-
             <Container>
-
                 <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
                     <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
                 </div>
@@ -570,9 +656,11 @@ class ITAdminDashboard extends Component {
                     <Col><HighchartsReact highcharts={Highcharts} options={lineAlloc} /></Col>
                     <Col sm={5}><HighchartsReact highcharts={Highcharts} options={ResourcePie} /></Col>
                 </Row>
-
-                <Row>
-                    <Table striped bordered hover variant="dark">
+                <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
+                    <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation details</h3>
+                </div>
+                <Row >
+                    <Table striped hover variant="light">
                         <thead>
                             <tr>
                                 <th>Resource Type</th>

@@ -8,6 +8,11 @@ const resourceAllocationSchema = mongoose.Schema({
     required: true
   },
 
+  requestId : {
+    type: Number,
+    required: true
+  },
+
   healthRisk : {
     type: String,
     required: false 
@@ -56,6 +61,28 @@ resourceAllocationSchema.statics.deallocate = async (req) => {
       return resource;
   };
 
+
+
+resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
+    // get allocated resources  aggregated count
+
+    console.log("inside")
+
+    const result =  await ResourceAllocation.aggregate([
+      {
+         "$group": {
+            "_id":  "$resourceType" ,
+            "allocatedResourcesCount": { $sum: 1 }
+     } 
+  }   
+
+  ]);
+ 
+ if (!result) {
+   throw new Error({ error: "Invalid resource details" });
+ }
+return result;
+};
 
 const ResourceAllocation = mongoose.model("ResourceAllocation", resourceAllocationSchema, "ResourceAllocation");
 

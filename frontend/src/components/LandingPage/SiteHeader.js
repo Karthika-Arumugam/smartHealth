@@ -21,6 +21,13 @@ class SiteHeader extends Component {
                 isLoggedIn: nextProps.getLogin,
 
             });
+            if (cookie.load('cookie')) {
+                const { userGroup: usergroup } = JSON.parse(window.atob(cookie.load('cookie').split('.')[1]));
+                this.setState({
+                    authToken: cookie.load('cookie') || '',
+                    usergroup
+                })
+            }
         }
     }
     async componentDidMount() {

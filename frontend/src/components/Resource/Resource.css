@@ -1,0 +1,34 @@
+
+.back-resource {
+    padding: 20px;  
+    margin-top: 15vh;
+    align-content: center;
+    margin-bottom: 50px;
+    /* background-image: url("/images/1.jpg"); */
+    background-color: rgba(228, 235, 238, 0.3);
+    background-blend-mode: overlay;
+    opacity: 0.75;
+}
+.resource-row {
+    width: 100% !important;
+    margin: auto !important;
+}
+html, button, input, select, textarea { font-family: sans-serif; }
+h1 { font-size: 2em; margin: 0.67em 0; }
+
+h2 { font-size: 1.5em; margin: 0.83em 0; }
+
+h3 { font-size: 1.17em; margin: 1em 0; }
+
+h4 { font-size: 1em; margin: 1.33em 0; }
+
+h5 { font-size: 0.83em; margin: 1.67em 0; }
+
+h6 { font-size: 0.75em; margin: 2.33em 0; }
+.container { margin-right: auto; margin-left: auto; padding-left: 15px; padding-right: 15px; *zoom: 1; }
+.recipes-list { margin-top: 50px; background-color: rgba(208, 227, 235, 0.3); border-radius: 1%;float: right}
+.recipe-image { width: 100px; height: 100px; border-radius: 100%; overflow: hidden; float: left; text-align: center; }
+.recipe .recipe-title { font-weight: 300; }
+.recipe-meta span.time, .recipe-meta span.calorie, .recipe-meta span.comment { margin-right: 15px; }
+.recipe-meta span.time img, .recipe-meta span.calorie img, .recipe-meta span.comment img { vertical-align: middle; margin-right: 5px; }
+.contact-form input[type="submit"]:hover, .contact-form input[type="submit"]:focus { background-color: #f59383; }

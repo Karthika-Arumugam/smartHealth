@@ -177,8 +177,8 @@ class ITAdminDashboard extends Component {
                 });
 
                 //Call Admin dashboard APIs
-                ///api/v1/resource/all?healthcareProvider={this.state.providerName}
-                const response = await fetch(`/api/v1/resource/all`, {
+                ///http://localhost:3001/api/v1/resource/all?healthcareProvider=apollo
+                const response = await fetch(`/api/v1/resource/all?healthcareProvider=apollo`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',

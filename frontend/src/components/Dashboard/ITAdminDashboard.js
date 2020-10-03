@@ -97,6 +97,8 @@ class ITAdminDashboard extends Component {
                 case ('Equipment'):
                     equipment[dateString] = equipment[dateString] ? equipment[dateString] + 1 : 1;
                     break;
+                default:
+                    break;
             }
         }
         // convert date : count to below format for each type
@@ -175,6 +177,7 @@ class ITAdminDashboard extends Component {
                 });
 
                 //Call Admin dashboard APIs
+                ///api/v1/resource/all?healthcareProvider={this.state.providerName}
                 const response = await fetch(`/api/v1/resource/all`, {
                     method: 'get',
                     mode: "cors",
@@ -389,9 +392,6 @@ class ITAdminDashboard extends Component {
 
                 }
             },
-            credits: {
-                enabled: false
-            },
             series: [{
                 name: 'Resource Allocation Response Time',
                 data: [this.state.avgallocation],
@@ -461,9 +461,6 @@ class ITAdminDashboard extends Component {
                     // text: 'Avg % response',
                     y: -70
                 }
-            },
-            credits: {
-                enabled: false
             },
             series: [{
                 name: 'Average response time',

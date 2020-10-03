@@ -27,6 +27,7 @@ class Main extends Component {
     getLogin = () => this.state.isLoggedIn
     render() {
         return (
+            //props to get isLoggedIn state across common component like header
             <BrowserRouter>
                 <Route render={props => <SiteHeader {...props} getLogin={this.state.isLoggedIn} />} />
                 <Route exact path="/" render={props => <LandingPage {...props} getLogin={this.state.isLoggedIn} />} />
@@ -36,7 +37,11 @@ class Main extends Component {
                 <Route exact path="/healthdash" component={HealthCareDashboard} />
                 <Route exact path="/admindash" component={ITAdminDashboard} />
                 <Route exact path="/patientprof" component={PatientProfile} />
-                <Route exact path="/resource" component={Resource} />
+                <Route exact path="/resource/:providerName" component={Resource} />
+                {/* <Route
+                            path="/item/:itemID"
+                            render={props => <Item {...props} toggleSpinner={this.toggleSpinner.bind(this)} />}
+                        /> */}
                 <SiteFooter />
             </BrowserRouter>
         )

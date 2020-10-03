@@ -95,9 +95,9 @@ class Signup extends Component {
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Create Account</h2>
                 <Row style={{ width: "20%", margin: "0 auto", marginTop: "2vh", marginBottom: "2vh" }}>
                     <ButtonGroup aria-label="Basic example" >
-                        <Button variant="info" onClick={this.onClickPatientCheckbox.bind(this)}>Patient</Button>
-                        <Button variant="info" onClick={this.onClickHealthCareProviderCheckbox.bind(this)}>Healthcare</Button>
-                        <Button variant="info" onClick={this.onClickAdminCheckbox.bind(this)}>Admin</Button>
+                        <Button variant="info" data-toggle="button" onClick={this.onClickPatientCheckbox.bind(this)}>Patient</Button>
+                        <Button variant="info" data-toggle="button" onClick={this.onClickHealthCareProviderCheckbox.bind(this)}>Healthcare</Button>
+                        <Button variant="info" data-toggle="button" onClick={this.onClickAdminCheckbox.bind(this)}>Admin</Button>
                     </ButtonGroup>
                 </Row>
                 <Container style={{ width: "80%", margin: "0 auto" }}>

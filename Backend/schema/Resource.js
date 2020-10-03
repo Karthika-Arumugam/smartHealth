@@ -49,7 +49,8 @@ resourceSchema.statics.getAvailability = async (req) => {
 
 resourceSchema.statics.getAll = async (req) => {
     // get available resources count
-    const data = await  Resource.find(req);
+ 
+    const data =  await Resource.findOne({ 'healthcareProvider' : req.query.healthcareProvider });
     
     if (!data) {
       throw new Error({ error: "Invalid resource details" });
@@ -125,14 +126,16 @@ resourceSchema.statics.update = async (req) => {
   };
 
 
-  resourceSchema.statics.aggregatedInfo = async (req) => {
+  resourceSchema.statics.availableResourceInfo = async (req) => {
+
+
     // get available resources  aggregated count
 
     const result =  await  Resource.aggregate([
       {
          "$group": {
             "_id":  "$type" ,
-            "totalCount": { $sum: "$available" }
+            "availableResourcesCount": { $sum: "$available" }
      } 
 }        
          

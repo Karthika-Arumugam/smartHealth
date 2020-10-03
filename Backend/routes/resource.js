@@ -83,7 +83,7 @@ router.delete('/delete', async (req, res) => {
       // get all resources
       let resource,result;
       try {
-        resource  = await Resource.getAll(req.body);
+        resource  = await Resource.getAll(req);
         result = JSON.parse(JSON.stringify(resource));
         res.json(result);
 
@@ -92,14 +92,14 @@ router.delete('/delete', async (req, res) => {
       }
   });
 
-  router.get('/aggregatedInfo', async (req, res) => {
+  router.get('/availabilityInfo', async (req, res) => {
     // if (!(req.cookies.cookie)) {
     //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
     //   }
       // get all resources
       let resource,result;
       try {
-        resource  = await Resource.aggregatedInfo(req.body);
+        resource  = await Resource.availableResourceInfo(req.body);
         result = JSON.parse(JSON.stringify(resource));
         res.json(result);
 

@@ -12,57 +12,45 @@ class Resource extends Component {
         this.state = {
             msg: '',
             authFlag: cookie.load('cookie') || false,
-            providerName: this.props.match.params.providerName,
+            providerName: props.match.params.providerName,
             image: '/images/a1.jpg' || '',
-            healthcarelist: {
-                _id: "5f73f2e05803b7c3928a5110",
-                type: "Cardiologist",
-                available: 20,
-                totalCount: 100,
-                healthcareProvider: "care",
-                owner: "deeps4@gmail.com",
-                createdDate: "2020-10-10",
-                __v: 0
-            }
+            healthcarelist: {}
         }
         this.imageHandler = this.imageHandler.bind(this);
+        this.changeQuantity = this.changeQuantity.bind(this);
+
     }
-    imageHandler = (e) => {
-        console.log("inside image handler")
-        switch (e.target.value) {
+    imageHandler = type => {
+        switch (type) {
             case ('Ambulance'):
-                this.setState({
-                    image: '/images/a1.jpg'
-                })
-                break;
+                return '/images/a1.jpg';
             case ('Medical Prescription'):
-                this.setState({
-                    image: '/images/a2.jpg'
-                })
-                break;
+                return '/images/a2.jpg';
             case ('Equipment'):
-                this.setState({
-                    image: '/images/a4.jpg'
-                })
-                break;
+                return '/images/a4.jpg';
             case ('Monitoring'):
-                this.setState({
-                    image: '/images/a3.jpg'
-                })
-                break;
+                return '/images/a3.jpg';
             case ('Cardiologist'):
-                this.setState({
-                    image: '/images/8.jpg'
-                })
-                break;
+                return '/images/8.jpg';
+            default:
+                return '/images/8.jpg';
         }
+    }
+    changeQuantity = () => async e => {
+
+        console.log(e.target.value);
+        const num = this.state.healthcarelist.totalCount + parseInt(e.target.value, 10);
+        const num1 = this.state.healthcarelist.available + parseInt(e.target.value, 10);
+        const newHealthcareList = this.state.healthcarelist;
+        newHealthcareList.totalCount = num;
+        newHealthcareList.available = num1;
+        this.setState({ healthcarelist: newHealthcareList });
     }
     async componentDidMount() {
         try {
             const authToken = cookie.load('cookie') || '';
             if (authToken) {
-                //http://localhost:3001/api/v1/resource/all?healthcareProvider=apollo
-                const response = await fetch(`/api/v1/resource/all`, {
+                const response = await fetch(`/api/v1/resource/all?healthcareProvider=${this.state.providerName}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -72,21 +60,10 @@ class Resource extends Component {
                     },
                 });
                 if (response.status === 200) {
-                    // const body = await response.json();
-                    const body = {
-                        _id: "5f73f2e05803b7c3928a5110",
-                        type: "Monitoring",
-                        available: 20,
-                        totalCount: 100,
-                        healthcareProvider: "care",
-                        owner: "deeps4@gmail.com",
-                        createdDate: "2020-10-10",
-                        __v: 0,
-                        image: '/images/a3.jpg'
-                    }
-                    if (body) {
+                    const body1 = await response.json();
+                    if (body1) {
                         this.setState({
-                            healthcarelist: body
+                            healthcarelist: body1
                         });
                     }
                 }
@@ -97,17 +74,95 @@ class Resource extends Component {
             this.setState({ message: e.message || e });
         }
     }
+    searchHandler = async e => {
+        e.preventDefault();
+        console.log("value", e.target.elements);
+    }
+
     render() {
         return (
             <Container className="back-resource" >
                 <Container className="resource-row">
                     {this.state.authFlag && this.state.usergroup === 'Patient' ? <Redirect to="/patientdash" /> : this.state.authFlag && this.state.usergroup === 'Healthcare' ? <Redirect to="/healthdash" /> : this.state.authFlag && this.state.usergroup === 'Admin' ? <Redirect to="/admindash" /> : ""}
-                    <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Allocate Resources</h2>
+                    <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Resources</h2>
+                    <Form onSubmit={this.searchHandler.bind(this)}>
+                        <Container className="recipes-list">
+                            <span className="recipe-title" >
+                                <input type="text" placeholder="Search Health Care Provider" style={{ width: "50%", height: "50px", margin: "10px" }} />
+                                <input type="submit" className="btn btn-info btn-lg" value="Search" style={{ margin: "5px" }} />
+                            </span>
+                        </Container>
+                    </Form>
+                    {Array.isArray(this.state.healthcarelist) ? (
+                        this.state.healthcarelist.map(ob => (
+                            <Container className="recipes-list">
+                                <article className="recipe">
+                                    <figure className="recipe-image"><img src={this.imageHandler(ob.type)} alt="Resource Icon" /></figure>
+                                    <div className="recipe-detail">
+                                        <h3 className="recipe-title"><b>Provider Name</b> {ob.healthcareProvider}</h3>
+                                        <h5><b>Type</b> {ob.type}</h5>
+                                        <div className="recipe-meta" >
+                                            <span className="time"><img src="/images/tag-1.png" alt="Total" />Total Count {ob.totalCount}</span>
+                                            <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
+                                            <span className="time"><img src="/images/icon-pie-chart@2x.png" alt="Date" />Last Updated {new Date(ob.createdDate).toLocaleDateString()}
+                                                <input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
+                                            </span>
+                                            <span className="contact-form" >
+                                                <input type="button" className="btn btn-info" value="Update" style={{ margin: "5px" }} />
+                                            </span>
+                                            <span className="contact-form" >
+                                                <input type="button" className="btn btn-danger" value="Delete" style={{ margin: "5px" }} />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </article>
+                            </Container>
+                        ))
+                    ) : null}
+                    {/* <Container className="recipes-list">
+                        <article className="recipe">
+                            <figure className="recipe-image"><img src={this.state.healthcarelist.image} alt="Resource Icon" /></figure>
+                            <div className="recipe-detail">
+                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
+                                <h5><b>Resource Type</b> {this.state.healthcarelist.type}</h5>
+                                <div className="recipe-meta" >
+                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
+                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
+                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
+                                        <input style={{ width: "100px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
+                                    </span>
+                                    <span className="contact-form" >
+                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </Container> */}
+                    {/* <Container className="recipes-list">
+                        <article className="recipe">
+                            <figure className="recipe-image"><img src='/images/a4.jpg' alt="Resource Icon" /></figure>
+                            <div className="recipe-detail">
+                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
+                                <h5><b>Resource Type</b> Ambulance</h5>
+                                <div className="recipe-meta" >
+                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
+                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
+                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
+                                        <input style={{ width: "100px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
+                                    </span>
+                                    <span className="contact-form" >
+                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </Container> */}
+                    <h4 style={{ marginTop: "5vh" }} >Add New Resource Type</h4>
                     <Form onSubmit={this.submitLogin}>
-                        {/* <Row>
-                            <Col md={2}>
+                        <Row style={{ padding: "50px" }}>
+                            {/* <Col md={2}>
                                 <figure className="recipe-image"><img src={this.state.image} alt="Resource Image" /></figure>
-                            </Col>
+                            </Col> */}
                             <Col md={3}>
                                 <Form.Control name="provider" as="select" required>
                                     <option>{this.state.providerName}</option>
@@ -122,50 +177,10 @@ class Resource extends Component {
                                     <option>Equipment</option>
                                 </Form.Control>
                             </Col>
-                            <Col md={1}><button type="button" className="btn btn-info">-</button></Col>
-                            <Col md={2}><Form.Control name="allocated" type="number" placeholder="allocated" required /></Col>
-                            <Col md={1}><button type="button" className="btn btn-info" >+</button></Col>
-                        </Row> */}
-                        {/* <Button variant="success" type="submit" style={{ marginRight: "2vw" }}>Allocate</Button> */}
+                            <Col md={3}><Form.Control name="allocated" type="number" placeholder="allocated" required /></Col>
+                            <Col md={2}><Button variant="success" type="submit" style={{ marginRight: "2vw" }}>Allocate</Button></Col>
+                        </Row>
                     </Form>
-                    <Container className="recipes-list">
-                        <article className="recipe">
-                            <figure className="recipe-image"><img src={this.state.healthcarelist.image} alt="Resource Icon" /></figure>
-                            <div className="recipe-detail">
-                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
-                                <h5><b>Resource Type</b> {this.state.healthcarelist.type}</h5>
-                                <div className="recipe-meta" >
-                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
-                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
-                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
-                                        <input style={{ width: "100px" }} type="number" onChange="" min="1" defaultValue="1" />
-                                    </span>
-                                    <span className="contact-form" >
-                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    </Container>
-                    <Container className="recipes-list">
-                        <article className="recipe">
-                            <figure className="recipe-image"><img src='/images/a4.jpg' alt="Resource Icon" /></figure>
-                            <div className="recipe-detail">
-                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
-                                <h5><b>Resource Type</b> Monitoring</h5>
-                                <div className="recipe-meta" >
-                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
-                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
-                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
-                                        <input style={{ width: "100px" }} type="number" onChange="" min="1" defaultValue="1" />
-                                    </span>
-                                    <span className="contact-form" >
-                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    </Container>
                     <p>{this.state.msg}</p>
                 </Container>
             </Container>

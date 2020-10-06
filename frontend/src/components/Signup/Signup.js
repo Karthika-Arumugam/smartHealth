@@ -112,7 +112,7 @@ class Signup extends Component {
                         </Row>
                         <Row className="signup-row">
                             <Col md={6}>
-                                <Form.Control name="email" type="email" placeholder="email" required />
+                                <Form.Control name="email" type="email" placeholder="Email ID" required />
                             </Col>
                             <Col md={6}>
                                 <Form.Control name="password" type="password" placeholder="Password" required />
@@ -189,7 +189,7 @@ class Signup extends Component {
                                 <Row>
                                     <Col md={3}></Col>
                                     <Col md={6}>
-                                        <Form.Control name="providerName" type="text" placeholder="Provider name" required />
+                                        <Form.Control name="providerName" type="text" placeholder="Provider Name" required />
                                     </Col>
                                     <Col md={3}></Col>
                                 </Row>
@@ -198,7 +198,7 @@ class Signup extends Component {
                                     (
                                         <Row className="signup-row">
                                             <Col md={4}>
-                                                <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
+                                                <Form.Control name="phoneNumber" type="tel" placeholder="Phone Number" />
                                             </Col>
                                             <Col md={4}>
                                                 <Form.Control name="emergencyContact" type="tel" placeholder="Emergency Contact" required />
@@ -219,7 +219,7 @@ class Signup extends Component {
                                         <Row className="signup-row">
                                             <Col md={4}></Col>
                                             <Col md={4}>
-                                                <Form.Control name="phoneNumber" type="tel" placeholder="PhoneNumber" />
+                                                <Form.Control name="phoneNumber" type="tel" placeholder="Phone Number" />
                                             </Col>
                                             <Col md={4}></Col>
                                         </Row>

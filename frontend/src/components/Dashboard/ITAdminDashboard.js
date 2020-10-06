@@ -15,63 +15,11 @@ highchartsMore(Highcharts);
 solidGauge(Highcharts);
 highcharts3d(Highcharts);
 
-const ResourcePie = {
-    chart: {
-        type: 'pie',
-        options3d: {
-            enabled: true,
-            alpha: 45,
-            beta: 0
-        }
-    },
-    title: {
-        text: 'Resource Type Availability Chart'
-    },
-    credits: {
-        enabled: false
-    },
-    accessibility: {
-        point: {
-            valueSuffix: '%'
-        }
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            depth: 35,
-            dataLabels: {
-                enabled: true,
-                format: '{point.name}'
-            }
-        }
-    },
-    series: [{
-        type: 'pie',
-        name: 'Resource Availability Percent',
-        data: [
-            ['Ambulance', 40.0],
-            ['Cardiologist', 26.8],
-            {
-                name: 'Monitoring',
-                y: 12.8,
-                sliced: true,
-                selected: true
-            },
-            ['Medical Prescription', 7.1],
-            ['Equipment', 5.0]
-        ]
-    }]
-}
-
 class ITAdminDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            resources: []
+            resources: [],
         }
         this.getResourceCount = this.getResourceCount.bind(this);
     }
@@ -163,7 +111,6 @@ class ITAdminDashboard extends Component {
                     return { status: response.status, body };
                 }).then(async response => {
                     if (response.status === 200) {
-
                         this.setState({
                             deviceCount: response.body,
                         });
@@ -177,8 +124,7 @@ class ITAdminDashboard extends Component {
                 });
 
                 //Call Admin dashboard APIs
-                ///http://localhost:3001/api/v1/resource/all?healthcareProvider=apollo
-                const response = await fetch(`/api/v1/resource/all?healthcareProvider=apollo`, {
+                const response = await fetch(`/api/v1/resource/all`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -196,6 +142,26 @@ class ITAdminDashboard extends Component {
                     }
                 }
                 this.setState({ message: response.status === 200 ? 'Success' : body.message });
+                //count allocation by status
+                const statusCount = await fetch('api/v1/resourceAllocation/allocationInfo', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                const statusbody = await statusCount.json();
+                if (statusbody) {
+                    console.log("status body", statusbody)
+                    this.setState({
+                        pendingCount: statusbody[2].pendingCount,
+                        completedCount: statusbody[3].completedCount,
+                        allocationCount: statusbody[1].allocationCount,
+                    })
+                    console.log("status body", this.state.pendingCount, this.state.completedCount)
+                }
                 //count the resources allocated each day
                 this.getResourceCount();
                 const throughput = await fetch('/api/v1/statistics/efficiency', {
@@ -230,6 +196,41 @@ class ITAdminDashboard extends Component {
                         avgResponseTime: num
                     })
                 }
+                //Resource Type availability Pie Chart
+                const resourcePieChart = await fetch('/api/v1/resource/availabilityInfo', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    }
+                });
+                const resourcePieRes = await resourcePieChart.json();
+                if (resourcePieRes) {
+                    for (let res of resourcePieRes) {
+                        console.log("pie response", res._id, res.availableResourcesCount);
+                        switch (res._id) {
+                            case 'Cardiologist':
+                                this.setState({ CardiologistPie: res.availableResourcesCount });
+                                break;
+                            case 'Ambulance':
+                                this.setState({ AmbulancePie: res.availableResourcesCount });
+                                break;
+                            case 'Monitoring':
+                                this.setState({ MonitoringPie: res.availableResourcesCount });
+                                break;
+                            case ('Equipment'):
+                                this.setState({ EquipmentPie: res.availableResourcesCount });
+                                break;
+                            case ("Medical Prescription"):
+                                this.setState({ PrescriptionPie: res.availableResourcesCount });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
             }
         }
         catch (e) {
@@ -237,6 +238,7 @@ class ITAdminDashboard extends Component {
         }
     }
     render() {
+
         const allocstatus = {
             chart: {
                 type: 'solidgauge',
@@ -308,32 +310,36 @@ class ITAdminDashboard extends Component {
                     stickyTracking: false,
                     rounded: true
                 }
+            }, credits: {
+                enabled: false
             },
-            series: [{
-                name: 'Move',
-                data: [{
-                    color: Highcharts.getOptions().colors[0],
-                    radius: '112%',
-                    innerRadius: '88%',
-                    y: 80
+            series: [
+                {
+                    name: 'Allocated',
+                    data: [{
+                        color: Highcharts.getOptions().colors[0],
+                        radius: '112%',
+                        innerRadius: '88%',
+                        y: this.state.allocationCount
+                    }]
+                },
+                {
+                    name: 'Completed',
+                    data: [{
+                        color: Highcharts.getOptions().colors[1],
+                        radius: '87%',
+                        innerRadius: '63%',
+                        y: this.state.completedCount
+                    }]
+                }, {
+                    name: 'Pending',
+                    data: [{
+                        color: Highcharts.getOptions().colors[2],
+                        radius: '62%',
+                        innerRadius: '38%',
+                        y: this.state.pendingCount
+                    }]
                 }]
-            }, {
-                name: 'Exercise',
-                data: [{
-                    color: Highcharts.getOptions().colors[1],
-                    radius: '87%',
-                    innerRadius: '63%',
-                    y: 65
-                }]
-            }, {
-                name: 'Stand',
-                data: [{
-                    color: Highcharts.getOptions().colors[2],
-                    radius: '62%',
-                    innerRadius: '38%',
-                    y: 50
-                }]
-            }]
         };
         const allocationgauge = {
             chart: {
@@ -543,6 +549,48 @@ class ITAdminDashboard extends Component {
                     }
                 }]
             }
+        }
+        const ResourcePie = {
+            chart: {
+                type: 'pie',
+
+            },
+            title: {
+                text: 'Resource Type Availability Chart'
+            },
+            credits: {
+                enabled: false
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    depth: 35,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}'
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Resource Availability Percent',
+                data: [
+                    ['Ambulance', this.state.AmbulancePie],
+                    ['Cardiologist', this.state.CardiologistPie],
+                    ['Monitoring', this.state.MonitoringPie],
+                    ['Medical Prescription', this.state.PrescriptionPie],
+                    ['Equipment', this.state.EquipmentPie]
+                ]
+            }]
         }
         const getTableEntries = () => {
             const xx = [];

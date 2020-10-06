@@ -50,7 +50,16 @@ resourceSchema.statics.getAvailability = async (req) => {
 resourceSchema.statics.getAll = async (req) => {
   // get available resources count
 
-  const data = await Resource.find({ 'healthcareProvider': req.query.healthcareProvider });
+  var data;
+
+  if(!req.query.healthcareProvider) {
+    console.log("all")
+    data = await Resource.find();
+  }
+  else {
+    console.log("query")
+   data = await Resource.find({ 'healthcareProvider': req.query.healthcareProvider });
+  }
 
   if (!data) {
     throw new Error({ error: "Invalid resource details" });

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { all } = require("../app");
 
 
 const resourceAllocationSchema = mongoose.Schema({
@@ -68,7 +69,7 @@ resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
 
     console.log("inside")
 
-    const result =  await ResourceAllocation.aggregate([
+    let result =  await ResourceAllocation.aggregate([
       {
          "$group": {
             "_id":  "$resourceType" ,
@@ -77,11 +78,40 @@ resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
   }   
 
   ]);
+
+  console.log(result)
+
+  // const result2 =  await ResourceAllocation.aggregate([
+  //   {
+  //     "$group": {
+  //       "_id": {  "allocationStatus" : "$allocated" },
+  //       "allocationCount": { $sum: 1 }
+  //     }
+  //   }
+
+  // ]);
+
+  var allocationStatus = {
+    allocationCount : await ResourceAllocation.countDocuments({ allocationStatus : "allocated" })
+  }
+
+  var pendingStatus = {
+    pendingCount : await ResourceAllocation.countDocuments({ allocationStatus : "pending" })
+  }
+
+
+  var completedStatus = {
+    completedCount : await ResourceAllocation.countDocuments({ allocationStatus : "deallocated" })
+  }
  
- if (!result) {
+  let result2 = [allocationStatus,pendingStatus,completedStatus];
+
+  let result3 = result.concat(...result2)
+
+ if (!result3) {
    throw new Error({ error: "Invalid resource details" });
  }
-return result;
+return result3;
 };
 
 const ResourceAllocation = mongoose.model("ResourceAllocation", resourceAllocationSchema, "ResourceAllocation");

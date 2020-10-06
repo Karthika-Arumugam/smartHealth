@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.post('/add', async (req, res) => {
 
-//   if (!(req.cookies.cookie)) {
-//     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-//   }
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
   // Create a new statistic record
   try {
     const data = new Statistics(req.body);
@@ -42,9 +42,9 @@ router.post('/update', async (req, res) => {
   });
 
   router.get('/avgResponseTime', async (req, res) => {
-    // if (!(req.cookies.cookie)) {
-    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-    //   }
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
    
       let avgResponseTime,result;
       try {
@@ -59,9 +59,9 @@ router.post('/update', async (req, res) => {
 
 
   router.get('/efficiency', async (req, res) => {
-    // if (!(req.cookies.cookie)) {
-    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-    //   }
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
    
       let efficiency,result;
       try {

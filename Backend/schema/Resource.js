@@ -53,11 +53,9 @@ resourceSchema.statics.getAll = async (req) => {
   var data;
 
   if(!req.query.healthcareProvider) {
-    console.log("all")
     data = await Resource.find();
   }
   else {
-    console.log("query")
    data = await Resource.find({ 'healthcareProvider': req.query.healthcareProvider });
   }
 
@@ -114,7 +112,7 @@ resourceSchema.statics.increment = async (req) => {
 
 resourceSchema.statics.decrement = async (req) => {
 
-  console.log(req.type)
+  console.log(req.resourceType)
   console.log(req.healthcareProvider)
 
   const resource = await Resource.findOne({ 'type': req.resourceType, 'healthcareProvider': req.healthcareProvider });
@@ -156,6 +154,9 @@ resourceSchema.statics.availableResourceInfo = async (req) => {
   return result;
 };
 
+resourceSchema.index({ healthcareProvider: 1, type: 1}, { unique: true });
+
 const Resource = mongoose.model("Resource", resourceSchema, "Resource");
+
 
 module.exports = Resource;

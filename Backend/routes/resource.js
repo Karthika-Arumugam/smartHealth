@@ -14,7 +14,7 @@ router.post('/add', async (req, res) => {
     res.status(201).send({ message : "Resource saved successfully" });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ message: "Unable to add resource"});
+    res.status(400).send({ message: "Unable to add resource, resource type already exists"});
   }
 });
 
@@ -77,9 +77,9 @@ router.delete('/delete', async (req, res) => {
   });
 
   router.get('/all', async (req, res) => {
-    // if (!(req.cookies.cookie)) {
-    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-    //   }
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
       // get all resources
       let resource,result;
       try {
@@ -93,9 +93,9 @@ router.delete('/delete', async (req, res) => {
   });
 
   router.get('/availabilityInfo', async (req, res) => {
-    // if (!(req.cookies.cookie)) {
-    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-    //   }
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
       // get all resources
       let resource,result;
       try {

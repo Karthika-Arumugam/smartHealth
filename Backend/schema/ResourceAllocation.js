@@ -11,12 +11,13 @@ const resourceAllocationSchema = mongoose.Schema({
 
   requestId : {
     type: Number,
-    required: true
+    required: true,
+    unique : true
   },
 
   healthRisk : {
     type: String,
-    required: false 
+    required: true 
   },
 
   healthcareProvider : {
@@ -29,12 +30,12 @@ const resourceAllocationSchema = mongoose.Schema({
     required: true
   },
 
-  allocatedTime : {
+  lastUpdatedAt : {
     type: Date,
     required: true
   },
 
-  allocationStatus : {
+  status : {
     type : String,
     required: true
   }
@@ -67,7 +68,14 @@ resourceAllocationSchema.statics.deallocate = async (req) => {
 resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
     // get allocated resources  aggregated count
 
-    console.log("inside")
+    let allocationCount =await ResourceAllocation.countDocuments({ allocationStatus : "allocated" })
+    let pendingCount =await ResourceAllocation.countDocuments({ allocationStatus : "pending" })
+    let completedCount =await ResourceAllocation.countDocuments({ allocationStatus : "deallocated" })
+
+    let map = new Map()
+    map['allocationCount'] = allocationCount/(allocationCount+pendingCount+completedCount)
+    map['pendingCount'] = pendingCount/(allocationCount+pendingCount+completedCount)
+    map['completedCount'] = completedCount/(allocationCount+pendingCount+completedCount)
 
     let result =  await ResourceAllocation.aggregate([
       {
@@ -79,39 +87,22 @@ resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
 
   ]);
 
-  console.log(result)
+  let result2 = [map,result];
 
-  // const result2 =  await ResourceAllocation.aggregate([
-  //   {
-  //     "$group": {
-  //       "_id": {  "allocationStatus" : "$allocated" },
-  //       "allocationCount": { $sum: 1 }
-  //     }
-  //   }
-
-  // ]);
-
-  var allocationStatus = {
-    allocationCount : await ResourceAllocation.countDocuments({ allocationStatus : "allocated" })
-  }
-
-  var pendingStatus = {
-    pendingCount : await ResourceAllocation.countDocuments({ allocationStatus : "pending" })
-  }
-
-
-  var completedStatus = {
-    completedCount : await ResourceAllocation.countDocuments({ allocationStatus : "deallocated" })
-  }
- 
-  let result2 = [allocationStatus,pendingStatus,completedStatus];
-
-  let result3 = result.concat(...result2)
-
- if (!result3) {
-   throw new Error({ error: "Invalid resource details" });
+ if (!result2) {
+   throw new Error({ error: "Couldn't get resource allocation details" });
  }
-return result3;
+return result2;
+};
+
+resourceAllocationSchema.statics.getAll = async (req) => {
+
+  const data = await ResourceAllocation.find({}).sort( { lastUpdatedAt : -1 } ).limit(10)
+
+  if (!data) {
+    throw new Error({ error: "Couldn't get resource allocation details" });
+  }
+  return data;
 };
 
 const ResourceAllocation = mongoose.model("ResourceAllocation", resourceAllocationSchema, "ResourceAllocation");

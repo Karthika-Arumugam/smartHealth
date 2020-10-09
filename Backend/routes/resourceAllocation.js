@@ -10,15 +10,13 @@ router.post('/allocate', async (req, res) => {
       // update resource
       let resource;
       try {
-
+       resource= await Resource.decrement(req.body);
         resource = new ResourceAllocation(req.body);
         await resource.save();
-
-      resource= await Resource.decrement(req.body);
-
         res.status(201).send({ message : "Resource saved successfully" });
       } catch (error) {
-        return res.status(400).json({ message: "Unable to update resource"});
+        console.log(error)
+        return res.status(400).json({ message: "Invalid resource details"});
       }
 });
 
@@ -43,9 +41,9 @@ router.post('/deallocate', async (req, res) => {
 
 
   router.get('/allocationInfo', async (req, res) => {
-    // if (!(req.cookies.cookie)) {
-    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
-    //   }
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
       // get all resources
       let resource,result;
       try {
@@ -57,6 +55,25 @@ router.post('/deallocate', async (req, res) => {
         res.status(400).send({ message: "Invalid resource details"});
       }
   });
+
+  router.get('/all', async (req, res) => {
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
+    
+      let resource,result;
+      try {
+        resource  = await ResourceAllocation.getAll(req);
+        result = JSON.parse(JSON.stringify(resource));
+        res.json(result);
+
+      } catch (error) {
+        res.status(400).send({ message: "Couldn't get resource allocation details"});
+      }
+  });
+
+
+
 
 
 module.exports = router;

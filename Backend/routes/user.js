@@ -20,10 +20,9 @@ router.post('/signup', async (req, res) => {
       await patient.save();
     }
 
-    
     res.status(201).send( user );
   } catch (error) {
-    res.status(400).send(error);
+    res.status(401).json({ message: error.message });
   }
 });
 
@@ -48,7 +47,7 @@ router.post("/login", async (req, res) => {
 
     res.send(user );
   } catch (error) {
-    res.status(400).send(error);
+    return res.status(401).json({ message: error.message });
   }
 });
 
@@ -128,6 +127,20 @@ router.post("/profile", async (req, res) => {
   }
 });
 
+router.get('/allHealthcare', async (req, res) => {
+  if (!(req.cookies.cookie)) {
+      return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    }
+  
+    let healthcare,result;
+    try {
+      healthcare  = await User.healthcareInfo(req);
+      result = JSON.parse(JSON.stringify(healthcare));
+      res.json(result);
 
+    } catch (error) {
+      res.status(400).send({ message: "Couldn't get healthcare information, please try again"});
+    }
+});
 
 module.exports = router;

@@ -84,21 +84,6 @@ const userSchema = mongoose.Schema({
 
   },
 
-  deviceName : {
-    type : String,
-    required : false
-  },
-
-  deviceType : {
-    type : String,
-    required : false
-  },
-
-  deviceStatus : {
-    type : Boolean,
-    required : false
-  },
-
   gender : {
     type : String,
     required : false
@@ -188,48 +173,21 @@ userSchema.statics.updateProfile = async (req) => {
 
 };
 
-userSchema.statics.activateDevice = async (emailId) => {
-  
+userSchema.statics.healthcareInfo = async (req) => {
 
-    const result =  await User.findOne({'emailId' : emailId });
+  console.log("inside")
 
-    if(!result)
-      return result;
+  const result =  await User.distinct('healthCareProvider');
 
-    var set = {
-        deviceStatus : true
-    }
-    
-    result.set(set);
-    const user = await result.save();
-
-    if(!user)
-      throw new Error({ error: "unable to activate device" });
-    
-      return user;
- 
-};
-
-userSchema.statics.deactivateDevice = async (emailId) => {
-
-  const result =  await User.findOne({'emailId' : emailId });
+  console.log(result)
 
   if(!result)
-    return result;
+   throw new Error({ message: "unable to get healthcare details" });
 
-  var set = {
-      deviceStatus : false
-  }
-  
-  result.set(set);
-  const user = await result.save();
-
-  if(!user)
-    throw new Error({ error: "unable to deactivate device" });
-  
-    return user;
+  return result;
 
 };
+
 
 
 const User = mongoose.model("User", userSchema, "User");

@@ -68,9 +68,9 @@ resourceAllocationSchema.statics.deallocate = async (req) => {
 resourceAllocationSchema.statics.allocatedResourceInfo = async (req) => {
     // get allocated resources  aggregated count
 
-    let allocationCount =await ResourceAllocation.countDocuments({ allocationStatus : "allocated" })
-    let pendingCount =await ResourceAllocation.countDocuments({ allocationStatus : "pending" })
-    let completedCount =await ResourceAllocation.countDocuments({ allocationStatus : "deallocated" })
+    let allocationCount =await ResourceAllocation.countDocuments({ status : "allocated" })
+    let pendingCount =await ResourceAllocation.countDocuments({ status : "pending" })
+    let completedCount =await ResourceAllocation.countDocuments({ status : "deallocated" })
 
     let map = new Map()
     map['allocationCount'] = allocationCount/(allocationCount+pendingCount+completedCount)

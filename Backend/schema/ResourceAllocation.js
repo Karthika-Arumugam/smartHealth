@@ -50,7 +50,7 @@ resourceAllocationSchema.statics.deallocate = async (req) => {
       return result;
 
       var set = {
-        allocationStatus  : "deallocated"
+        status  : "deallocated"
     }
     
     result.set(set);

@@ -10,7 +10,7 @@ class Resource extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            msg: '',
+            message: '',
             authFlag: cookie.load('cookie') || false,
             providerName: props.match.params.providerName,
             image: '/images/a1.jpg' || '',
@@ -18,7 +18,9 @@ class Resource extends Component {
         }
         this.imageHandler = this.imageHandler.bind(this);
         this.changeQuantity = this.changeQuantity.bind(this);
-
+        this.deleteHandler = this.deleteHandler.bind(this);
+        this.addHandler = this.addHandler.bind(this);
+        this.repaint = this.repaint.bind(this);
     }
     imageHandler = type => {
         switch (type) {
@@ -45,6 +47,97 @@ class Resource extends Component {
         newHealthcareList.totalCount = num;
         newHealthcareList.available = num1;
         this.setState({ healthcarelist: newHealthcareList });
+    }
+    deleteHandler = (resourceObj) => async e => {
+        e.preventDefault();
+        if (!resourceObj) {
+            this.setState({ message: "Mandatory resource details missing" });
+            return;
+        }
+        const { healthcareProvider, type } = resourceObj;
+        if (!healthcareProvider || !type) {
+            this.setState({ message: "Mandatory resource details missing" });
+            console.error("Mandatory resource details missing");
+            return;
+        }
+        const sleep = msec => new Promise(r => setTimeout(r, msec));
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (!authToken) {
+                this.setState({ message: "Session expired login to continue" });
+                console.error("Session expired login to continue");
+                return;
+            }
+            //add to logic to return if usergroup is not admin
+            const delResourceObj = {
+                type: type,
+                healthcareProvider: healthcareProvider
+            };
+            const response = await fetch('/api/v1/resource/delete', {
+                method: 'delete',
+                mode: "cors",
+                redirect: 'follow',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(delResourceObj)
+            });
+            const body = await response.json();
+            console.log(body);
+            await sleep(2000);
+            this.setState({ message: body.message });
+            this.repaint();
+        } catch (e) {
+            console.error(e.message || e);
+            this.setState({ message: e.message || e });
+        }
+    }
+    addHandler = () => async e => {
+        e.preventDefault();
+        const { type, provider, count } = e.target.elements;
+
+        if (!type || !provider || !count) {
+            console.error("Mandatory info missing to add resource type");
+            this.setState({ message: "Mandatory info missing to add resource type" });
+            return;
+        }
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (!authToken) {
+                this.setState({ message: "Session expired login to continue" });
+                return;
+            }
+            // call /add api to add new resource type
+            const { emailId } = JSON.parse(window.atob(authToken.split('.')[1]))
+            const d = (new Date().getMonth() + 1) + '-' + (new Date().getDate()) + '-' + (new Date().getFullYear())
+            const addResourceObj = {
+                type: type.value,
+                totalCount: count.value,
+                healthcareProvider: provider.value,
+                createdDate: d,
+                owner: emailId,
+                available: count.value
+
+            };
+            console.log(addResourceObj);
+            const response = await fetch(`/api/v1/resource/add`, {
+                method: 'post',
+                mode: "cors",
+                redirect: 'follow',
+                headers: {
+                    'content-type': 'application/json',
+                    'Authorization': authToken
+                },
+                body: JSON.stringify(addResourceObj)
+            });
+            const body = await response.json();
+            console.log(body);
+            this.setState({ message: body.message });
+            this.repaint();
+        } catch (e) {
+            console.error(e.message || e);
+            this.setState({ message: e.message || e });
+        }
     }
     async componentDidMount() {
         try {
@@ -78,7 +171,35 @@ class Resource extends Component {
         e.preventDefault();
         console.log("value", e.target.elements);
     }
+    repaint = async () => {
 
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (authToken) {
+                const response = await fetch(`/api/v1/resource/all?healthcareProvider=${this.state.providerName}`, {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                if (response.status === 200) {
+                    const body1 = await response.json();
+                    if (body1) {
+                        this.setState({
+                            healthcarelist: body1
+                        });
+                    }
+                }
+            }
+            else
+                this.setState({ message: "Session expired login to continue" });
+        } catch (e) {
+            this.setState({ message: e.message || e });
+        }
+    }
     render() {
         return (
             <Container className="back-resource" >
@@ -104,14 +225,13 @@ class Resource extends Component {
                                         <div className="recipe-meta" >
                                             <span className="time"><img src="/images/tag-1.png" alt="Total" />Total Count {ob.totalCount}</span>
                                             <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
-                                            <span className="time"><img src="/images/icon-pie-chart@2x.png" alt="Date" />Last Updated {new Date(ob.createdDate).toLocaleDateString()}
-                                                <input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
+                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity()} min="1" defaultValue="1" />
                                             </span>
                                             <span className="contact-form" >
                                                 <input type="button" className="btn btn-info" value="Update" style={{ margin: "5px" }} />
                                             </span>
                                             <span className="contact-form" >
-                                                <input type="button" className="btn btn-danger" value="Delete" style={{ margin: "5px" }} />
+                                                <input type="button" className="btn btn-danger" onClick={this.deleteHandler(ob)} value="Delete" style={{ margin: "5px" }} />
                                             </span>
                                         </div>
                                     </div>
@@ -157,32 +277,34 @@ class Resource extends Component {
                             </div>
                         </article>
                     </Container> */}
-                    <h4 style={{ marginTop: "5vh" }} >Add New Resource Type</h4>
-                    <Form onSubmit={this.submitLogin}>
-                        <Row style={{ padding: "50px" }}>
-                            {/* <Col md={2}>
-                                <figure className="recipe-image"><img src={this.state.image} alt="Resource Image" /></figure>
-                            </Col> */}
-                            <Col md={3}>
-                                <Form.Control name="provider" as="select" required>
-                                    <option>{this.state.providerName}</option>
-                                </Form.Control>
-                            </Col>
-                            <Col md={3}>
-                                <Form.Control name="provider" as="select" onChange={this.imageHandler} required>
-                                    <option>Ambulance</option>
-                                    <option>Medical Prescription</option>
-                                    <option>Monitoring</option>
-                                    <option>Cardiologist</option>
-                                    <option>Equipment</option>
-                                </Form.Control>
-                            </Col>
-                            <Col md={3}><Form.Control name="allocated" type="number" placeholder="allocated" required /></Col>
-                            <Col md={2}><Button variant="success" type="submit" style={{ marginRight: "2vw" }}>Allocate</Button></Col>
-                        </Row>
-                    </Form>
-                    <p>{this.state.msg}</p>
+                    <Container className="recipes-list" >
+                        <h4 style={{ marginTop: "5vh" }} >Add New Resource Type</h4>
+                        <Form onSubmit={this.addHandler()}>
+                            <Row style={{ padding: "50px" }}>
+                                <Col md={2}>
+                                    <figure className="recipe-image"><img src={this.state.image} alt="Resource Type" /></figure>
+                                </Col>
+                                <Col md={2}>
+                                    <Form.Control name="provider" as="select" required>
+                                        <option>{this.state.providerName}</option>
+                                    </Form.Control>
+                                </Col>
+                                <Col md={3}>
+                                    <Form.Control name="type" as="select" onChange={this.imageHandler} required>
+                                        <option>Ambulance</option>
+                                        <option>Medical Prescription</option>
+                                        <option>Monitoring</option>
+                                        <option>Cardiologist</option>
+                                        <option>Equipment</option>
+                                    </Form.Control>
+                                </Col>
+                                <Col md={3}><Form.Control name="count" type="number" min="1" required /></Col>
+                                <Col md={2}><Button variant="success" type="submit" style={{ marginRight: "2vw" }}>Add</Button></Col>
+                            </Row>
+                        </Form>
+                    </Container>
                 </Container>
+                <p>{this.state.message}</p>
             </Container>
         );
     }

@@ -20,6 +20,7 @@ class Resource extends Component {
         this.changeQuantity = this.changeQuantity.bind(this);
         this.deleteHandler = this.deleteHandler.bind(this);
         this.addHandler = this.addHandler.bind(this);
+        this.updateHandler = this.updateHandler.bind(this);
         this.repaint = this.repaint.bind(this);
     }
     imageHandler = type => {
@@ -38,14 +39,12 @@ class Resource extends Component {
                 return '/images/8.jpg';
         }
     }
-    changeQuantity = () => async e => {
-
-        console.log(e.target.value);
-        const num = this.state.healthcarelist.totalCount + parseInt(e.target.value, 10);
-        const num1 = this.state.healthcarelist.available + parseInt(e.target.value, 10);
-        const newHealthcareList = this.state.healthcarelist;
-        newHealthcareList.totalCount = num;
-        newHealthcareList.available = num1;
+    changeQuantity = (index) => async e => {
+        const newQty = parseInt(e.target.value);
+        const newHealthcareList = JSON.parse(JSON.stringify(this.state.healthcarelist));
+        newHealthcareList[index].totalCount = newQty;
+        // newHealthcareList[index].available = newQty;
+        newHealthcareList[index].quantity = newQty;
         this.setState({ healthcarelist: newHealthcareList });
     }
     deleteHandler = (resourceObj) => async e => {
@@ -139,6 +138,44 @@ class Resource extends Component {
             this.setState({ message: e.message || e });
         }
     }
+    updateHandler = (index) => async () => {
+        const resourceObj = JSON.parse(JSON.stringify(this.state.healthcarelist[index]));
+        const { healthcareProvider, type, available, totalCount } = resourceObj;
+
+        if (!healthcareProvider || !type || !totalCount || !available) {
+            this.setState({ message: "Mandatory resource details missing" });
+            console.error("Mandatory resource details missing");
+            return;
+        }
+        const sleep = msec => new Promise(r => setTimeout(r, msec));
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (!authToken) {
+                this.setState({ message: "Session expired login to continue" });
+                console.error("Session expired login to continue");
+                return;
+            }
+            //add to logic to return if usergroup is not admin
+            const updateResourceObj = { type, healthcareProvider, totalCount, available };
+            const response = await fetch('/api/v1/resource/update', {
+                method: 'post',
+                mode: "cors",
+                redirect: 'follow',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(updateResourceObj)
+            });
+            const body = await response.json();
+            console.log(body);
+            await sleep(2000);
+            this.setState({ message: body.message });
+            this.repaint();
+        } catch (e) {
+            console.error(e.message || e);
+            this.setState({ message: e.message || e });
+        }
+    }
     async componentDidMount() {
         try {
             const authToken = cookie.load('cookie') || '';
@@ -154,7 +191,8 @@ class Resource extends Component {
                 });
                 if (response.status === 200) {
                     const body1 = await response.json();
-                    if (body1) {
+                    if (body1 && Array.isArray(body1)) {
+                        body1.forEach(ob => ob.quantity = ob.totalCount);
                         this.setState({
                             healthcarelist: body1
                         });
@@ -169,7 +207,33 @@ class Resource extends Component {
     }
     searchHandler = async e => {
         e.preventDefault();
-        console.log("value", e.target.elements);
+        const provider = e.target.elements.searchText.value;
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (authToken) {
+                const response = await fetch(`/api/v1/resource/all?healthcareProvider=${provider}`, {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                if (response.status === 200) {
+                    const body = await response.json();
+                    if (body) {
+                        this.setState({
+                            healthcarelist: body
+                        });
+                    }
+                }
+            }
+            else
+                this.setState({ message: "Session expired login to continue" });
+        } catch (e) {
+            this.setState({ message: e.message || e });
+        }
     }
     repaint = async () => {
 
@@ -209,14 +273,14 @@ class Resource extends Component {
                     <Form onSubmit={this.searchHandler.bind(this)}>
                         <Container className="recipes-list">
                             <span className="recipe-title" >
-                                <input type="text" placeholder="Search Health Care Provider" style={{ width: "50%", height: "50px", margin: "10px" }} />
+                                <input type="text" name="searchText" placeholder="Search Health Care Provider" style={{ width: "50%", height: "50px", margin: "10px" }} required autoFocus />
                                 <input type="submit" className="btn btn-info btn-lg" value="Search" style={{ margin: "5px" }} />
                             </span>
                         </Container>
                     </Form>
                     {Array.isArray(this.state.healthcarelist) ? (
-                        this.state.healthcarelist.map(ob => (
-                            <Container className="recipes-list">
+                        this.state.healthcarelist.map((ob, index) => (
+                            <Container className="recipes-list" key={index}>
                                 <article className="recipe">
                                     <figure className="recipe-image"><img src={this.imageHandler(ob.type)} alt="Resource Icon" /></figure>
                                     <div className="recipe-detail">
@@ -225,10 +289,10 @@ class Resource extends Component {
                                         <div className="recipe-meta" >
                                             <span className="time"><img src="/images/tag-1.png" alt="Total" />Total Count {ob.totalCount}</span>
                                             <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
-                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity()} min="1" defaultValue="1" />
+                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min="1" defaultValue={ob.quantity} />
                                             </span>
                                             <span className="contact-form" >
-                                                <input type="button" className="btn btn-info" value="Update" style={{ margin: "5px" }} />
+                                                <input type="button" className="btn btn-info" onClick={() => this.updateHandler(index)()} value="Update" style={{ margin: "5px" }} />
                                             </span>
                                             <span className="contact-form" >
                                                 <input type="button" className="btn btn-danger" onClick={this.deleteHandler(ob)} value="Delete" style={{ margin: "5px" }} />

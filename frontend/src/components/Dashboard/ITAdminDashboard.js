@@ -15,63 +15,11 @@ highchartsMore(Highcharts);
 solidGauge(Highcharts);
 highcharts3d(Highcharts);
 
-const ResourcePie = {
-    chart: {
-        type: 'pie',
-        options3d: {
-            enabled: true,
-            alpha: 45,
-            beta: 0
-        }
-    },
-    title: {
-        text: 'Resource Type Availability Chart'
-    },
-    credits: {
-        enabled: false
-    },
-    accessibility: {
-        point: {
-            valueSuffix: '%'
-        }
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            depth: 35,
-            dataLabels: {
-                enabled: true,
-                format: '{point.name}'
-            }
-        }
-    },
-    series: [{
-        type: 'pie',
-        name: 'Resource Availability Percent',
-        data: [
-            ['Ambulance', 40.0],
-            ['Cardiologist', 26.8],
-            {
-                name: 'Monitoring',
-                y: 12.8,
-                sliced: true,
-                selected: true
-            },
-            ['Medical Prescription', 7.1],
-            ['Equipment', 5.0]
-        ]
-    }]
-}
-
 class ITAdminDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            resources: []
+            resources: [],
         }
         this.getResourceCount = this.getResourceCount.bind(this);
     }
@@ -79,9 +27,9 @@ class ITAdminDashboard extends Component {
         const ambulance = {}, prescription = {}, monitoring = {}, cardiologist = {}, equipment = {};
         //create recource type obj as {10/10/2020:3,10/11/2020:4} date:count
         for (let key of this.state.resources) {
-            const datealloc = new Date(key.createdDate)
+            const datealloc = new Date(key.lastUpdatedAt)
             const dateString = datealloc.toLocaleDateString()
-            switch (key.type) {
+            switch (key.resourceType) {
                 case ('Ambulance'):
                     ambulance[dateString] = ambulance[dateString] ? ambulance[dateString] + 1 : 1;
                     break;
@@ -127,13 +75,15 @@ class ITAdminDashboard extends Component {
         }
         this.setState({ prescriptionDataChart: prescriptionData });
 
+
         //4. monitoring Chart Data
         const monitoringData = [];
-        for (let key in prescription) {
+        for (let key in monitoring) {
             let d = new Date(key);
             monitoringData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), monitoring[key]]);
         }
         this.setState({ monitoringDataChart: monitoringData });
+        console.log("inside count", this.state.monitoringDataChart)
 
         //5. Equipment Chart Data
         const equipmentData = [];
@@ -142,6 +92,7 @@ class ITAdminDashboard extends Component {
             equipmentData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), monitoring[key]]);
         }
         this.setState({ equipmentDataChart: equipmentData });
+
     };
 
     async componentDidMount() {
@@ -163,7 +114,6 @@ class ITAdminDashboard extends Component {
                     return { status: response.status, body };
                 }).then(async response => {
                     if (response.status === 200) {
-
                         this.setState({
                             deviceCount: response.body,
                         });
@@ -176,9 +126,76 @@ class ITAdminDashboard extends Component {
                     console.log(err)
                 });
 
-                //Call Admin dashboard APIs
-                ///http://localhost:3001/api/v1/resource/all?healthcareProvider=apollo
-                const response = await fetch(`/api/v1/resource/all?healthcareProvider=apollo`, {
+                //avg response time graph
+                const avgresbody = await fetch('/api/v1/statistics/avgResponseTime', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                let avgres = await avgresbody.json();
+                if (avgres) {
+                    const num = (avgres * 100).toFixed(2);
+                    this.setState({
+                        avgResponseTime: num
+                    })
+                }
+
+                const throughput = await fetch('/api/v1/statistics/efficiency', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                const throughputbody = await throughput.json();
+                if (throughputbody) {
+                    this.setState({
+                        avgallocation: throughputbody * 100
+                    })
+                }
+                //Resource Type availability Pie Chart
+                const resourcePieChart = await fetch('/api/v1/resource/availabilityInfo', {
+                    method: 'get',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    }
+                });
+                const resourcePieRes = await resourcePieChart.json();
+                if (resourcePieRes) {
+                    for (let res of resourcePieRes) {
+                        console.log("pie response", res._id, res.availableResourcesCount);
+                        switch (res._id) {
+                            case ("Cardiologist"):
+                                this.setState({ CardiologistPie: res.availableResourcesCount });
+                                break;
+                            case ("Ambulance"):
+                                this.setState({ AmbulancePie: res.availableResourcesCount });
+                                break;
+                            case ("Monitoring"):
+                                this.setState({ MonitoringPie: res.availableResourcesCount });
+                                break;
+                            case ("Equipment"):
+                                this.setState({ EquipmentPie: res.availableResourcesCount });
+                                break;
+                            case ("Medical Prescription"):
+                                this.setState({ PrescriptionPie: res.availableResourcesCount });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                //Call resource allocation details
+                const response = await fetch(`/api/v1/resourceAllocation/all`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -198,7 +215,8 @@ class ITAdminDashboard extends Component {
                 this.setState({ message: response.status === 200 ? 'Success' : body.message });
                 //count the resources allocated each day
                 this.getResourceCount();
-                const throughput = await fetch('/api/v1/statistics/efficiency', {
+                //count allocation by status
+                const statusCount = await fetch('api/v1/resourceAllocation/allocationInfo', {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -207,36 +225,25 @@ class ITAdminDashboard extends Component {
                         'Authorization': authToken
                     },
                 });
-                const throughputbody = await throughput.json();
-                if (throughputbody) {
+                const statusbody = await statusCount.json();
+                if (statusbody) {
+                    console.log("status body", statusbody)
                     this.setState({
-                        avgallocation: throughputbody * 100
+                        pendingCount: statusbody[0].pendingCount,
+                        completedCount: statusbody[0].completedCount,
+                        allocationCount: statusbody[0].allocationCount,
                     })
-                }
-                //avg response time graph
-                const avgresbody = await fetch('/api/v1/statistics/avgResponseTime', {
-                    method: 'get',
-                    mode: "cors",
-                    redirect: 'follow',
-                    headers: {
-                        'content-type': 'application/json',
-                        'Authorization': authToken
-                    },
-                });
-                let avgres = await avgresbody.json();
-                if (avgres) {
-                    const num = (avgres * 100).toFixed(2);
-                    this.setState({
-                        avgResponseTime: num
-                    })
+                    console.log("status body", this.state.pendingCount, this.state.completedCount)
                 }
             }
         }
         catch (e) {
+            console.error(e);
             this.setState({ message: e.message || e });
         }
     }
     render() {
+
         const allocstatus = {
             chart: {
                 type: 'solidgauge',
@@ -308,32 +315,36 @@ class ITAdminDashboard extends Component {
                     stickyTracking: false,
                     rounded: true
                 }
+            }, credits: {
+                enabled: false
             },
-            series: [{
-                name: 'Move',
-                data: [{
-                    color: Highcharts.getOptions().colors[0],
-                    radius: '112%',
-                    innerRadius: '88%',
-                    y: 80
+            series: [
+                {
+                    name: 'Allocated',
+                    data: [{
+                        color: Highcharts.getOptions().colors[0],
+                        radius: '112%',
+                        innerRadius: '88%',
+                        y: this.state.allocationCount
+                    }]
+                },
+                {
+                    name: 'Completed',
+                    data: [{
+                        color: Highcharts.getOptions().colors[1],
+                        radius: '87%',
+                        innerRadius: '63%',
+                        y: this.state.completedCount
+                    }]
+                }, {
+                    name: 'Pending',
+                    data: [{
+                        color: Highcharts.getOptions().colors[2],
+                        radius: '62%',
+                        innerRadius: '38%',
+                        y: this.state.pendingCount
+                    }]
                 }]
-            }, {
-                name: 'Exercise',
-                data: [{
-                    color: Highcharts.getOptions().colors[1],
-                    radius: '87%',
-                    innerRadius: '63%',
-                    y: 65
-                }]
-            }, {
-                name: 'Stand',
-                data: [{
-                    color: Highcharts.getOptions().colors[2],
-                    radius: '62%',
-                    innerRadius: '38%',
-                    y: 50
-                }]
-            }]
         };
         const allocationgauge = {
             chart: {
@@ -393,7 +404,7 @@ class ITAdminDashboard extends Component {
                 }
             },
             series: [{
-                name: 'Resource Allocation Response Time',
+                name: 'Medical Resource Allocation Response Time',
                 data: [this.state.avgallocation],
                 dataLabels: {
                     format:
@@ -544,17 +555,64 @@ class ITAdminDashboard extends Component {
                 }]
             }
         }
+        const ResourcePie = {
+            chart: {
+                type: 'pie',
+            },
+            title: {
+                text: 'Resource Type Availability Chart'
+            },
+            credits: {
+                enabled: false
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    depth: 35,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}'
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Resource Availability Percent',
+                data: [
+                    ['Ambulance', Number(this.state.AmbulancePie)],
+                    ['Cardiologist', Number(this.state.CardiologistPie)],
+                    ['Monitoring', Number(this.state.MonitoringPie)],
+                    ['Medical Prescription', Number(this.state.PrescriptionPie)],
+                    ['Equipment', Number(this.state.EquipmentPie)]
+                    // ['Ambulance', 19],
+                    // ['Cardiologist', 38],
+                    // ['Monitoring', 19],
+                    // ['Medical Prescription', 10],
+                    // ['Equipment', 40]
+                ]
+            }]
+        }
         const getTableEntries = () => {
             const xx = [];
             for (let key of this.state.resources) {
-                const datealloc = new Date(key.createdDate)
+                const datealloc = new Date(key.lastUpdatedAt)
                 const dateString = datealloc.toLocaleDateString()
                 xx.push(
                     <tr>
-                        <td>{key.type}</td>
+                        <td>{key.resourceType}</td>
                         <td>{key.healthcareProvider}</td>
-                        <td>{key.owner}</td>
+                        <td>{key.patient}</td>
                         <td>{dateString}</td>
+                        <td>{key.status}</td>
                         <td><Link to={`/resource/${key.healthcareProvider}`}><Button variant="info" >Manage</Button></Link></td>
                     </tr>
                 )
@@ -640,7 +698,7 @@ class ITAdminDashboard extends Component {
                     <Col sm={5}><HighchartsReact highcharts={Highcharts} options={ResourcePie} /></Col>
                 </Row>
                 <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
-                    <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation details</h3>
+                    <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation Details</h3>
                 </div>
                 <Row >
                     <Table striped hover variant="light">
@@ -650,6 +708,7 @@ class ITAdminDashboard extends Component {
                                 <th>Provider Name</th>
                                 <th>Assigned To</th>
                                 <th>Assigned Date</th>
+                                <th>Status</th>
                                 <th>Manage Tab</th>
                             </tr>
                         </thead>

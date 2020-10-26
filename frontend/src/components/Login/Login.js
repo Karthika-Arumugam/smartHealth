@@ -80,7 +80,7 @@ class Login extends Component {
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Login</h2>
                 <Form onSubmit={this.submitLogin}>
                     <Form.Group style={{ width: "50%" }} controlId="formGroupEmail" >
-                        <Form.Control type="email" placeholder="Enter Email ID" onChange={this.usernameChangeHandler} required autofocus />
+                        <Form.Control type="email" placeholder="Enter Email ID" onChange={this.usernameChangeHandler} required autoFocus />
                     </Form.Group>
                     <Form.Group style={{ width: "50%" }} controlId="formGroupPassword">
                         <Form.Control type="password" placeholder="Enter Password" onChange={this.passwordChangeHandler} required />

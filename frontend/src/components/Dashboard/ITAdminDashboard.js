@@ -404,7 +404,7 @@ class ITAdminDashboard extends Component {
                 }
             },
             series: [{
-                name: 'Resource Allocation Response Time',
+                name: 'Medical Resource Allocation Response Time',
                 data: [this.state.avgallocation],
                 dataLabels: {
                     format:

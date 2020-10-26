@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Redirect } from 'react-router-dom';
 import './Resource.css'
 import cookie from 'react-cookies';
+import { isArray } from 'highcharts';
 
 class Resource extends Component {
     constructor(props) {
@@ -82,7 +83,6 @@ class Resource extends Component {
                 body: JSON.stringify(delResourceObj)
             });
             const body = await response.json();
-            console.log(body);
             await sleep(2000);
             this.setState({ message: body.message });
             this.repaint();
@@ -118,7 +118,6 @@ class Resource extends Component {
                 available: count.value
 
             };
-            console.log(addResourceObj);
             const response = await fetch(`/api/v1/resource/add`, {
                 method: 'post',
                 mode: "cors",
@@ -130,7 +129,6 @@ class Resource extends Component {
                 body: JSON.stringify(addResourceObj)
             });
             const body = await response.json();
-            console.log(body);
             this.setState({ message: body.message });
             this.repaint();
         } catch (e) {
@@ -156,7 +154,13 @@ class Resource extends Component {
                 return;
             }
             //add to logic to return if usergroup is not admin
-            const updateResourceObj = { type, healthcareProvider, totalCount, available };
+            let delta;
+            if (isArray(this.state.deltaObj)) {
+                //check for healthcareProvider and type to get the delta value
+                const origValues = this.state.deltaObj.find(ob => ob.type == type && ob.healthcareProvider == healthcareProvider)
+                delta = Number(totalCount - origValues['totalCount']);
+            }
+            const updateResourceObj = { type, healthcareProvider, totalCount, available, delta };
             const response = await fetch('/api/v1/resource/update', {
                 method: 'post',
                 mode: "cors",
@@ -167,7 +171,6 @@ class Resource extends Component {
                 body: JSON.stringify(updateResourceObj)
             });
             const body = await response.json();
-            console.log(body);
             await sleep(2000);
             this.setState({ message: body.message });
             this.repaint();
@@ -194,7 +197,8 @@ class Resource extends Component {
                     if (body1 && Array.isArray(body1)) {
                         body1.forEach(ob => ob.quantity = ob.totalCount);
                         this.setState({
-                            healthcarelist: body1
+                            healthcarelist: body1,
+                            deltaObj: body1
                         });
                     }
                 }
@@ -289,7 +293,7 @@ class Resource extends Component {
                                         <div className="recipe-meta" >
                                             <span className="time"><img src="/images/tag-1.png" alt="Total" />Total Count {ob.totalCount}</span>
                                             <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
-                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min="1" defaultValue={ob.quantity} />
+                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min={ob.available} defaultValue={ob.quantity} />
                                             </span>
                                             <span className="contact-form" >
                                                 <input type="button" className="btn btn-info" onClick={() => this.updateHandler(index)()} value="Update" style={{ margin: "5px" }} />
@@ -349,8 +353,8 @@ class Resource extends Component {
                                     <figure className="recipe-image"><img src={this.state.image} alt="Resource Type" /></figure>
                                 </Col>
                                 <Col md={2}>
-                                    <Form.Control name="provider" as="select" required>
-                                        <option>{this.state.providerName}</option>
+                                    <Form.Control type="text" name="provider" placeholder={this.state.providerName} required>
+
                                     </Form.Control>
                                 </Col>
                                 <Col md={3}>

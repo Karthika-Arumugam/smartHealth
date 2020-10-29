@@ -31,9 +31,11 @@ class PatientDashboard extends Component {
         let highRiskCount = 0, lowRiskcount = 0;
 
         try {
-            const authToken = cookie.load('cookie') || '';
+            this.setState({
+                authToken: cookie.load('cookie') || false
+            })
 
-            if (authToken) {
+            if (this.state.authToken) {
                 const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
                 //TO ADD LOGIC FOR userGroup is Patient then call patient dashboard
                 const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
@@ -42,7 +44,7 @@ class PatientDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
                 const body = await response.json();
@@ -85,8 +87,10 @@ class PatientDashboard extends Component {
 
         //Call /activateDevice api
         try {
-            const authToken = cookie.load('cookie') || '';
-            if (authToken) {
+            this.setState({
+                authToken: cookie.load('cookie') || false
+            })
+            if (this.state.authToken) {
 
                 const endpoint = this.state.deviceStatus == false ? "activateDevice" : "deactivateDevice";
                 const response = await fetch(`api/v1/patient/${endpoint}`, {
@@ -95,7 +99,7 @@ class PatientDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
                 const body = await response.json();

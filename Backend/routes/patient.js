@@ -91,7 +91,7 @@ router.post("/activateDevice", async (req, res) => {
 
       // generate payload with patient static info, start simulator on edge
       const smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-      const payload = `{\"PatientID\": \"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\": ${isMale},\"years\" : ${smokeYears},\"Smoke\":\"${isSmoker}\" }`
+      const payload = `{\"PatientID\": \"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\": ${isMale},\"years\" : ${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"True" }`
       await send(payload);
       res.json({ "deviceStatus": true });
     }
@@ -107,17 +107,38 @@ router.post("/deactivateDevice", async (req, res) => {
   if (!(req.cookies.cookie)) {
     return res.status(401).json({ message: "You are not logged in,please login to continue" });
   }
-  // update user profile
+
   try {
 
-    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
-    user = await Patient.deactivateDevice(user.emailId);
+    const token = jwt.verify(req.cookies.cookie, JWT_KEY);
+    // deactivate device status
+    const user = await Patient.deactivateDevice(token.emailId);
 
     if (!user)
       return res.status(400).json({ message: "Invalid credentials" });
 
-    if (user)
+    if (user) {
+
+      //init Edge device connection  
+      init();
+
+      // get static patient info
+      let patientDetails = await User.getProfile(user.emailId);
+      patientDetails = patientDetails._doc;
+      let isSmoker, isMale;
+
+      isSmoker = (patientDetails.smokingyears) ? "Yes" : "No";
+      if (patientDetails.gender) {
+        isMale = (patientDetails.gender == "Male") ? 1 : 0;
+      }
+
+      // generate payload with patient static info, start simulator on edge
+      const smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+      const payload = `{\"PatientID\": \"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\": ${isMale},\"years\" : ${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"False" }`
+      await send(payload);
       res.json({ "deviceStatus": false });
+    }
+
     else
       res.json({ "deviceStatus": true });
   } catch (error) {

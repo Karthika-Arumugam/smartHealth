@@ -47,7 +47,7 @@ class Signup extends Component {
             city: city.value,
             state: state.value,
             zip: zipcode.value,
-            //change this
+
             userGroup: this.state.userGroup,
             ...(
                 this.state.userGroup === "Healthcare" ?

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Badge, Row, Col, Toast, Alert } from 'react-bootstrap';
+import { Form, Container, Badge, Row, Col, Toast, Alert } from 'react-bootstrap';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts/highstock';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
@@ -20,7 +20,9 @@ class PatientDashboard extends Component {
             docCount: 0,
             medCount: 0,
             riskPercent: {},
-            deviceName: "R343S"
+            deviceStatus: "",
+            authToken: cookie.load('cookie') || false,
+            message: '',
         }
     }
     async componentDidMount() {
@@ -30,8 +32,9 @@ class PatientDashboard extends Component {
 
         try {
             const authToken = cookie.load('cookie') || '';
+
             if (authToken) {
-                const { id, emailId, userGroup } = JSON.parse(window.atob(authToken.split('.')[1]));
+                const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
                 //TO ADD LOGIC FOR userGroup is Patient then call patient dashboard
                 const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
                     method: 'get',
@@ -59,15 +62,51 @@ class PatientDashboard extends Component {
                             riskPercent: {
                                 High: (highRiskCount / total) * 100,
                                 Low: (lowRiskcount / total) * 100
-                            }
+                            },
+                            deviceStatus: body.deviceStatus
                         })
                     }
                 }
-                this.setState({ message: response.status === 200 ? 'account created successfully! please login to continue...' : body.message });
+                this.setState({ message: response.status !== 200 ? body.message : '' });
             }
+            else
+                this.setState({ message: "Session expired login to continue" });
+
         } catch (e) {
             this.setState({ message: e.message || e });
         }
+    }
+    async onClickDeviceCheckbox() {
+
+        //Change device state staus
+        this.setState({
+            deviceStatus: !this.state.deviceStatus
+        });
+
+        //Call /activateDevice api
+        try {
+            const authToken = cookie.load('cookie') || '';
+            if (authToken) {
+
+                const endpoint = this.state.deviceStatus == false ? "activateDevice" : "deactivateDevice";
+                const response = await fetch(`api/v1/patient/${endpoint}`, {
+                    method: 'post',
+                    mode: "cors",
+                    redirect: 'follow',
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': authToken
+                    },
+                });
+                const body = await response.json();
+                this.setState({ message: response.status === 200 ? 'Device activated and data is monitored' : body.message });
+            }
+            else
+                this.setState({ message: "Session expired login to continue" });
+        } catch (e) {
+            this.setState({ message: e.message || e });
+        }
+
     }
     render() {
 
@@ -413,38 +452,56 @@ class PatientDashboard extends Component {
             }],
 
         }
+        const deviceStatusTitle = this.state.deviceStatus == false ? "Disabled" : "Active";
+        const switchLabel = this.state.deviceStatus == false ? "Enable?" : "Disable?";
         return (
             <Container>
-                <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
-                    <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Patient Dashboard</h2>
-                    <Toast style={{ position: 'absolute', top: 0, right: 0, }}>
+                {this.state.authToken ? <Container>
+                    <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
+                        <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Patient Dashboard</h2>
+                        {/* <Toast style={{ position: 'absolute', top: 0, right: 0, }}>
                         <Toast.Header>
                             <img src="holder.js/20x20?text=%20" className="rounded mr-2" alt="" />
                             <strong className="mr-auto">Recommended</strong>
                             <small> just now</small>
                         </Toast.Header>
                         <Toast.Body>See? Just like this.</Toast.Body>
-                    </Toast>
-                </div>
-                {/* <Alert variant='danger'><b> This is a danger alert—check it out </b></Alert> */}
-                <Row style={{ width: '100%', margin: "0px 0px 0px 0px" }}>
-                    <Row className='text-stats-panel' style={{ width: '100%' }}>
-                        <div style={{ margin: "0 auto", padding: "0", width: "30%" }}>
-                            My Resources Stats
+                    </Toast> */}
+                    </div>
+                    <Row style={{ width: '100%', margin: "0px 0px 0px 0px" }}>
+                        <Row className='text-stats-panel' style={{ width: '100%' }}>
+                            <div style={{ margin: "0 auto", padding: "0", width: "30%" }}>
+                                My Resources Stats
                         </div>
+                        </Row>
+
+                        <Row className='text-stats-panel' style={{ width: "100%" }} >
+                            <Col>
+                                <h1>
+                                    <Badge variant={this.state.deviceStatus == false ? "warning" : "success"}>My Device Status<br></br>{deviceStatusTitle}<br></br><br></br>
+                                        <h5><Form.Check
+                                            type="switch"
+                                            id="custom-switch"
+                                            size="small"
+                                            label={switchLabel}
+                                            checked={this.state.deviceStatus}
+                                            onChange={this.onClickDeviceCheckbox.bind(this)}
+                                        /></h5>
+                                    </Badge>
+                                </h1>
+                            </Col>
+                            <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                            <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                        </Row>
                     </Row>
-                    <Row className='text-stats-panel' style={{ width: "100%" }} >
-                        <Col><h1><Badge variant="success">Device Active<br></br>{this.state.deviceName}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
-                        <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
-                        <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                    <Row>
+                        <Col xs={9} ><HighchartsReact highcharts={Highcharts} options={healthstats4Risk} /></Col>
+                        <Col><HighchartsReact highcharts={Highcharts} options={RiskAggregate} /></Col>
                     </Row>
-                </Row>
-                <Row>
-                    <Col xs={9} ><HighchartsReact highcharts={Highcharts} options={healthstats4Risk} /></Col>
-                    <Col><HighchartsReact highcharts={Highcharts} options={RiskAggregate} /></Col>
-                </Row>
-                <HighchartsReact highcharts={Highcharts} options={heartRate} />
-                <HighchartsReact highcharts={Highcharts} options={healthstats2Risk} />
+                    <HighchartsReact highcharts={Highcharts} options={heartRate} />
+                    <HighchartsReact highcharts={Highcharts} options={healthstats2Risk} />
+                </Container> : ""}
+                <p>{this.state.message}</p>
             </Container>
         );
     }

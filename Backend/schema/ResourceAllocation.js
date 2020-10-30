@@ -97,7 +97,7 @@ return result2;
 
 resourceAllocationSchema.statics.getAll = async (req) => {
 
-  const data = await ResourceAllocation.find({}).sort( { lastUpdatedAt : -1 } ).limit(10)
+  const data = await ResourceAllocation.find({}).sort( { lastUpdatedAt : -1 } ).limit(20)
 
   if (!data) {
     throw new Error({ error: "Couldn't get resource allocation details" });

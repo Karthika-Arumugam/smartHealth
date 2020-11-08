@@ -10,7 +10,10 @@ import PatientDashboard from './Dashboard/PatientDashboard';
 import HealthCareDashboard from './Dashboard/HealthCareDashboard';
 import ITAdminDashboard from './Dashboard/ITAdminDashboard'
 import PatientProfile from './Profile/PatientProfile';
-import Resource from './Resource/Resource'
+import AdminProfile from './Profile/AdminProfile';
+import HealthCareProfile from './Profile/HealthCareProfile';
+import Resource from './Resource/Resource';
+import ActivePatient from './Patient/ActivePatient';
 
 class Main extends Component {
     constructor(props) {
@@ -36,7 +39,10 @@ class Main extends Component {
                 <Route exact path="/patientdash" component={PatientDashboard} />
                 <Route exact path="/healthdash" component={HealthCareDashboard} />
                 <Route exact path="/admindash" component={ITAdminDashboard} />
+                <Route exact path="/activepatient" component={ActivePatient} />
                 <Route exact path="/patientprof" component={PatientProfile} />
+                <Route exact path="/adminprof" component={AdminProfile} />
+                <Route exact path="/healthcareprof" component={HealthCareProfile} />
                 <Route exact path="/resource/:providerName" component={Resource} />
                 {/* <Route
                             path="/item/:itemID"

@@ -11,6 +11,7 @@ import Highcharts from "highcharts/highcharts.js";
 import highchartsMore from "highcharts/highcharts-more.js";
 import solidGauge from "highcharts/modules/solid-gauge.js";
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 highchartsMore(Highcharts);
 solidGauge(Highcharts);
 highcharts3d(Highcharts);
@@ -20,6 +21,8 @@ class ITAdminDashboard extends Component {
         super(props);
         this.state = {
             resources: [],
+            authToken: cookie.load('cookie') || false,
+            message: ''
         }
         this.getResourceCount = this.getResourceCount.bind(this);
     }
@@ -97,9 +100,11 @@ class ITAdminDashboard extends Component {
 
     async componentDidMount() {
         try {
-            const authToken = cookie.load('cookie') || '';
+            this.setState({
+                authToken: cookie.load('cookie') || false
+            })
 
-            if (authToken) {
+            if (this.state.authToken) {
 
                 //call active device counts
                 fetch('api/v1/patient/activeDeviceCount', {
@@ -133,7 +138,7 @@ class ITAdminDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
                 let avgres = await avgresbody.json();
@@ -144,19 +149,20 @@ class ITAdminDashboard extends Component {
                     })
                 }
 
+                //throughput graph
                 const throughput = await fetch('/api/v1/statistics/efficiency', {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
                 const throughputbody = await throughput.json();
                 if (throughputbody) {
                     this.setState({
-                        avgallocation: throughputbody * 100
+                        avgallocation: (throughputbody * 100).toFixed(2)
                     })
                 }
                 //Resource Type availability Pie Chart
@@ -166,7 +172,7 @@ class ITAdminDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     }
                 });
                 const resourcePieRes = await resourcePieChart.json();
@@ -201,7 +207,7 @@ class ITAdminDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 })
                 const body = await response.json();
@@ -222,20 +228,21 @@ class ITAdminDashboard extends Component {
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
                 const statusbody = await statusCount.json();
                 if (statusbody) {
                     console.log("status body", statusbody)
                     this.setState({
-                        pendingCount: statusbody[0].pendingCount,
-                        completedCount: statusbody[0].completedCount,
-                        allocationCount: statusbody[0].allocationCount,
+                        pendingCount: parseFloat((statusbody[0].pendingCount * 100).toFixed(2)),
+                        completedCount: parseFloat((statusbody[0].completedCount * 100).toFixed(2)),
+                        allocationCount: parseFloat((statusbody[0].allocationCount * 100).toFixed(2)),
                     })
                     console.log("status body", this.state.pendingCount, this.state.completedCount)
                 }
-            }
+            } else
+                this.setState({ message: "Session expired login to continue" });
         }
         catch (e) {
             console.error(e);
@@ -405,7 +412,7 @@ class ITAdminDashboard extends Component {
             },
             series: [{
                 name: 'Medical Resource Allocation Response Time',
-                data: [this.state.avgallocation],
+                data: [parseFloat(this.state.avgallocation)],
                 dataLabels: {
                     format:
                         '<div style="text-align:center">' +
@@ -603,7 +610,8 @@ class ITAdminDashboard extends Component {
         }
         const getTableEntries = () => {
             const xx = [];
-            for (let key of this.state.resources) {
+            for (let [index, key] of this.state.resources.entries()) {
+                console.log(index);
                 const datealloc = new Date(key.lastUpdatedAt)
                 const dateString = datealloc.toLocaleDateString()
                 xx.push(
@@ -681,42 +689,45 @@ class ITAdminDashboard extends Component {
         }
         return (
             <Container>
-                <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
-                    <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
-                </div>
-                <Row>
-                    <Col><h1><Badge variant="info">Active Devices<br></br><br></br>{this.state.deviceCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
-                </Row>
-                <Row >
-                    <Col><HighchartsReact highcharts={Highcharts} options={allocstatus} /></Col>
-                    <Col><HighchartsReact highcharts={Highcharts} options={allocationgauge} /></Col>
-                    <Col><HighchartsReact highcharts={Highcharts} options={waitgauge} /></Col>
-                </Row>
+                {this.state.authToken ? <Container>
+                    <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
+                        <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
+                    </div>
+                    <Row>
+                        <Col><h1><Badge variant="info">Active Devices<br></br><br></br>{this.state.deviceCount}<br></br><br></br><h6> <Link to="/activepatient">more info</Link></h6></Badge></h1></Col>
+                    </Row>
+                    <Row >
+                        <Col><HighchartsReact highcharts={Highcharts} options={allocstatus} /></Col>
+                        <Col><HighchartsReact highcharts={Highcharts} options={allocationgauge} /></Col>
+                        <Col><HighchartsReact highcharts={Highcharts} options={waitgauge} /></Col>
+                    </Row>
 
-                <Row>
-                    <Col><HighchartsReact highcharts={Highcharts} options={lineAlloc} /></Col>
-                    <Col sm={5}><HighchartsReact highcharts={Highcharts} options={ResourcePie} /></Col>
-                </Row>
-                <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
-                    <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation Details</h3>
-                </div>
-                <Row >
-                    <Table striped hover variant="light">
-                        <thead>
-                            <tr>
-                                <th>Resource Type</th>
-                                <th>Provider Name</th>
-                                <th>Assigned To</th>
-                                <th>Assigned Date</th>
-                                <th>Status</th>
-                                <th>Manage Tab</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {getTableEntries()}
-                        </tbody>
-                    </Table>
-                </Row>
+                    <Row>
+                        <Col><HighchartsReact highcharts={Highcharts} options={lineAlloc} /></Col>
+                        <Col sm={5}><HighchartsReact highcharts={Highcharts} options={ResourcePie} /></Col>
+                    </Row>
+                    <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
+                        <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation Details</h3>
+                    </div>
+                    <Row >
+                        <Table striped hover variant="light">
+                            <thead>
+                                <tr>
+                                    <th>Resource Type</th>
+                                    <th>Provider Name</th>
+                                    <th>Assigned To</th>
+                                    <th>Assigned Date</th>
+                                    <th>Status</th>
+                                    <th>Manage Tab</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {getTableEntries()}
+                            </tbody>
+                        </Table>
+                    </Row>
+                </Container> : ""}
+                <p>{this.state.message}</p>
             </Container>
         );
     }

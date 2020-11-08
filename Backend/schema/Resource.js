@@ -135,10 +135,14 @@ resourceSchema.statics.decrement = async (req) => {
 
 resourceSchema.statics.availableResourceInfo = async (req) => {
 
-
   // get available resources  aggregated count
 
-  const result = await Resource.aggregate([
+  let result;
+
+  if(req.body.healthcareProvider) {
+
+   result = await Resource.aggregate([
+    { "$match" : { "healthcareProvider" : req.body.healthcareProvider } },
     {
       "$group": {
         "_id": "$type",
@@ -147,6 +151,21 @@ resourceSchema.statics.availableResourceInfo = async (req) => {
     }
 
   ]);
+
+}
+else {
+  
+  result = await Resource.aggregate([
+    {
+      "$group": {
+        "_id": "$type",
+        "availableResourcesCount": { $sum: "$available" }
+      }
+    }
+
+  ]);
+
+}
 
   if (!result) {
     throw new Error({ error: "Invalid resource details" });

@@ -32,6 +32,10 @@ const patientSchema = mongoose.Schema({
     required: false
   },
 
+  currRiskStatus : {
+    type : Number,
+    required: false
+  },
 
 
   alerts: [
@@ -221,9 +225,30 @@ if(!patient)
 
 patientSchema.statics.activeDevicesCount = async (req) => {
 
-  console.log("start")
+  let result;
+  let map = new Map()
 
-  const result =  await Patient.countDocuments({ deviceStatus : true});
+  if(req.body.healthcareProvider) {
+
+     map['activeDeviceCount']  =  await Patient.countDocuments({ deviceStatus : true, 'healthcareProvider' : req.body.healthcareProvider });
+
+     const high =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 3});
+     const medium =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 2});
+     const low =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 1});
+     const healthy =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 0});
+
+     map['high'] = high
+     map['medium'] = medium
+     map['low'] = low
+     map['healthy'] = healthy
+
+     result = map
+
+  }
+  else {
+     map['activeDeviceCount'] =  await Patient.countDocuments({ deviceStatus : true});
+     result = map
+  }
   
   if(!result)
     throw new Error({ error: "Invalid input details" });

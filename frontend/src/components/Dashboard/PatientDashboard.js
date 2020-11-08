@@ -37,7 +37,7 @@ class PatientDashboard extends Component {
 
             if (this.state.authToken) {
                 const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
-                //TO ADD LOGIC FOR userGroup is Patient then call patient dashboard
+
                 const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
                     method: 'get',
                     mode: "cors",
@@ -479,7 +479,7 @@ class PatientDashboard extends Component {
                         </div>
                         </Row>
 
-                        <Row className='text-stats-panel' style={{ width: "100%" }} >
+                        <Row className='text-stats-panel'>
                             <Col>
                                 <h1>
                                     <Badge variant={this.state.deviceStatus == false ? "warning" : "success"}>My Device Status<br></br>{deviceStatusTitle}<br></br><br></br>

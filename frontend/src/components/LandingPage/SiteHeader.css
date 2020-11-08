@@ -7,3 +7,9 @@
     justify-content: center;
     font-size: calc(10px + 2vmin);
   }
+  .animated {
+    /* -webkit-animation-duration: 1s; */
+    animation-duration: 1s;
+    -webkit-animation-delay: 0s;
+    animation-delay: 0s;
+  }

@@ -165,6 +165,24 @@ router.get("/activeDeviceCount", async (req, res) => {
   }
 });
 
+router.get("/morePatientInfo", async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+
+  try {
+    const result = await Patient.moreInfo(req);
+
+    if (!result)
+      return res.status(400).json({ message: "Invalid details" });
+
+    res.json(result);
+  } catch (error) {
+    res.status(400).send({ message: "Server error! Unable to get patient info" });
+  }
+});
+
 
 
 module.exports = router;

@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_KEY} = require('../config.js');
 
 const patientSchema = mongoose.Schema({
+
   emailId: {
     type: String,
     required: true,
@@ -14,6 +15,32 @@ const patientSchema = mongoose.Schema({
         throw new Error({ error: "Invalid Email address" });
       }
     },
+  },
+
+  phone : {
+    type : String,
+    required: true
+
+  },
+
+  firstName : {
+    type : String,
+    required: true
+  },
+  lastName : {
+    type : String,
+    required: true
+  },
+
+  age : {
+    type : Number,
+    required: true
+
+  },
+
+  gender : {
+    type : String,
+    required : false
   },
 
   time: [{
@@ -256,6 +283,20 @@ patientSchema.statics.activeDevicesCount = async (req) => {
   return result;
   
   };
+
+
+  patientSchema.statics.moreInfo = async (req) => {
+
+    // Fields required from api are patients name, age, gender, contact no, latest risk prediction
+
+    let result =  Patient.find({deviceStatus : true}, {emailId : 1, age : 1, gender : 1, firstName : 1, lastName : 1, phone : 1, currRiskStatus : 1});
+
+    if(!result)
+      throw new Error({ error: "Invalid input details" });
+  
+    return result;
+    
+    };
 
 const Patient = mongoose.model("Patient", patientSchema, "Patient");
 

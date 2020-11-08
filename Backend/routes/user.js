@@ -15,8 +15,18 @@ router.post('/signup', async (req, res) => {
     await user.save();
     // const token = await user.generateAuthToken();
 
+
     if(req.body.userGroup == "Patient")  {
-      const patient = new Patient({emailId : req.body.emailId,  riskStatus: 0,  time : new Date()});
+      const patient = new Patient({emailId : req.body.emailId,
+        firstName : req.body.firstName,
+        lastName : req.body.lastName,
+        age : req.body.age,
+        gender : req.body.gender,
+        phone : req.body.phone,
+        currRiskStatus: 0,  
+        healthcareProvider : req.body.healthcareProvider,
+        time : new Date()});
+
       await patient.save();
     }
 

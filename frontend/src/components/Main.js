@@ -11,6 +11,7 @@ import HealthCareDashboard from './Dashboard/HealthCareDashboard';
 import ITAdminDashboard from './Dashboard/ITAdminDashboard'
 import PatientProfile from './Profile/PatientProfile';
 import AdminProfile from './Profile/AdminProfile';
+import HealthCareProfile from './Profile/HealthCareProfile';
 import Resource from './Resource/Resource';
 import ActivePatient from './Patient/ActivePatient';
 
@@ -41,6 +42,7 @@ class Main extends Component {
                 <Route exact path="/activepatient" component={ActivePatient} />
                 <Route exact path="/patientprof" component={PatientProfile} />
                 <Route exact path="/adminprof" component={AdminProfile} />
+                <Route exact path="/healthcareprof" component={HealthCareProfile} />
                 <Route exact path="/resource/:providerName" component={Resource} />
                 {/* <Route
                             path="/item/:itemID"

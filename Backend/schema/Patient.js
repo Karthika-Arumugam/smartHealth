@@ -255,14 +255,14 @@ patientSchema.statics.activeDevicesCount = async (req) => {
   let result;
   let map = new Map()
 
-  if(req.body.healthcareProvider) {
+  if(req.query.healthcareProvider) {
 
-     map['activeDeviceCount']  =  await Patient.countDocuments({ deviceStatus : true, 'healthcareProvider' : req.body.healthcareProvider });
+     map['activeDeviceCount']  =  await Patient.countDocuments({ deviceStatus : true, 'healthcareProvider' : req.query.healthcareProvider });
 
-     const high =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 3});
-     const medium =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 2});
-     const low =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 1});
-     const healthy =  await Patient.countDocuments({'healthcareProvider' : req.body.healthcareProvider , 'currRiskStatus' : 0});
+     const high =  await Patient.countDocuments({'healthcareProvider' : req.query.healthcareProvider , 'currRiskStatus' : 3});
+     const medium =  await Patient.countDocuments({'healthcareProvider' : req.query.healthcareProvider , 'currRiskStatus' : 2});
+     const low =  await Patient.countDocuments({'healthcareProvider' : req.query.healthcareProvider , 'currRiskStatus' : 1});
+     const healthy =  await Patient.countDocuments({'healthcareProvider' : req.query.healthcareProvider , 'currRiskStatus' : 0});
 
      map['high'] = high
      map['medium'] = medium

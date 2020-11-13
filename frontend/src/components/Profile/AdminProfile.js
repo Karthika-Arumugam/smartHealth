@@ -31,7 +31,8 @@ class AdminProfile extends Component {
             })
 
             if (this.state.authToken) {
-                const response = await fetch(`/api/v1/users/profile`, {
+                const { emailId } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
+                const response = await fetch(`/api/v1/users/profile?emailId=${emailId}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',

@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import { Container } from 'react-bootstrap';
+import { Form, Button, Container, Col, Row } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from 'react-router-dom';
 import './ActivePatient.css'
 import cookie from 'react-cookies';
+import { isArray } from 'highcharts';
 
-
-class ActivePatient extends Component {
+class ActivePatientDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
             message: '',
             authFlag: cookie.load('cookie') || false,
-            riskStatus: props.match.params.riskStatus,
+            emailID: props.match.params.patientid,
             image: '/images/a2.jpg' || '',
             healthcarelist: {}
         }
@@ -74,11 +74,11 @@ class ActivePatient extends Component {
                     }
                     let patientDetailsArr = [];
                     if (patientList && Array.isArray(patientList)) {
-                        if (this.state.riskStatus === "all") {
+                        if (this.state.riskStatus == "all") {
                             patientDetailsArr = patientList;
                         }
                         else {
-                            patientDetailsArr = patientList.filter(ob => this.state.currRisk === ob.currRiskStatus);
+                            patientDetailsArr = patientList.filter(ob => this.state.currRisk == ob.currRiskStatus);
                         }
                         console.log("response patient details", this.state.patientDetails);
 
@@ -115,30 +115,34 @@ class ActivePatient extends Component {
         return (
             <Container className="back-resource" >
                 <Container className="resource-row">
-                    <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Actively Monitored Patients</h2>
-                    {Array.isArray(this.state.patientDetails) ? (
-                        this.state.patientDetails.map((ob, index) => (
-                            <Container className="recipes-list" key={index}>
-                                <article className="recipe">
-                                    <figure className="recipe-image"><img src="/images/photo-3.jpg" alt="Resource Icon" /></figure>
-                                    <div className="recipe-detail">
-                                        <h3 className="recipe-title"><Link to={`/activepatientdetails/${ob.emailId}`}><b> {ob.firstName} {ob.lastName}</b></Link></h3>
-                                        <h5><b>Risk Prediction</b> {ob.riskString}</h5>
-                                        <div className="recipe-meta" >
-                                            <span className="time"><img src="/images/icon-envelope.png" alt="email" />Email {ob.emailId}</span>
-                                            <span className="time"><img src="/images/icon-phone.png" alt="contact" />Contact Number {ob.phone}</span>
-                                            <span className="time"><img src="/images/icon-pie-chart.png" alt="gender" />Gender {ob.gender}</span>
-                                            <span className="time"><img src="/images/icon-pie-chart.png" alt="age" />Age {ob.age}</span>
-                                        </div>
-                                    </div>
-                                </article>
-                            </Container>
-                        ))
-                    ) : null}
+                    <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Patient Details</h2>
+
+                    <div style={{ width: "20%", height: "auto", margin: "0 auto" }}>
+
+                        <img style={{ imageOrientation: "from-image", width: "13vw", height: "auto", position: "relative" }} src="/images/photo-3.jpg"></img>
+
+                    </div>
+                    <Container className="recipes-list" >
+
+                        <article className="recipe">
+                            <h3 className="recipe-title"><b> Priya Khadke</b></h3>
+                            <div className="recipe-detail">
+                                <h5><b>Current Risk Prediction</b> Healthy</h5>
+                                <div className="recipe-meta" >
+                                    <span className="calorie"><img src="/images/icon-envelope.png" alt="email" /><b>Email</b> priyakhadke15@gmail.com</span>
+                                    <span className="calorie"><img src="/images/icon-phone.png" alt="contact" /><b>Contact Number</b> 9890467672</span>
+                                </div>
+                                <div className="recipe-meta">
+                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="gender" /><b>Gender</b> Female</span>
+                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="age" /><b>Age</b> 30</span>
+                                </div>
+                            </div>
+                        </article>
+                    </Container>
                 </Container>
                 <p>{this.state.message}</p>
             </Container >
         );
     }
 }
-export default ActivePatient;
+export default ActivePatientDetails;

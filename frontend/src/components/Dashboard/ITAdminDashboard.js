@@ -11,7 +11,6 @@ import Highcharts from "highcharts/highcharts.js";
 import highchartsMore from "highcharts/highcharts-more.js";
 import solidGauge from "highcharts/modules/solid-gauge.js";
 import { Link } from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
 highchartsMore(Highcharts);
 solidGauge(Highcharts);
 highcharts3d(Highcharts);
@@ -119,8 +118,9 @@ class ITAdminDashboard extends Component {
                     return { status: response.status, body };
                 }).then(async response => {
                     if (response.status === 200) {
+                        console.log(response.body);
                         this.setState({
-                            deviceCount: response.body,
+                            deviceCount: response.body.activeDeviceCount,
                         });
                     } else {
                         this.setState({
@@ -611,19 +611,21 @@ class ITAdminDashboard extends Component {
         const getTableEntries = () => {
             const xx = [];
             for (let [index, key] of this.state.resources.entries()) {
-                console.log(index);
-                const datealloc = new Date(key.lastUpdatedAt)
-                const dateString = datealloc.toLocaleDateString()
-                xx.push(
-                    <tr>
-                        <td>{key.resourceType}</td>
-                        <td>{key.healthcareProvider}</td>
-                        <td>{key.patient}</td>
-                        <td>{dateString}</td>
-                        <td>{key.status}</td>
-                        <td><Link to={`/resource/${key.healthcareProvider}`}><Button variant="info" >Manage</Button></Link></td>
-                    </tr>
-                )
+                console.log(typeof (index));
+                if (index < 10) {
+                    const datealloc = new Date(key.lastUpdatedAt)
+                    const dateString = datealloc.toLocaleDateString()
+                    xx.push(
+                        <tr>
+                            <td>{key.resourceType}</td>
+                            <td>{key.healthcareProvider}</td>
+                            <td>{key.patient}</td>
+                            <td>{dateString}</td>
+                            <td>{key.status}</td>
+                            <td><Link to={`/resource/${key.healthcareProvider}`}><Button variant="info" >Manage</Button></Link></td>
+                        </tr>
+                    )
+                }
             }
             return xx;
         }
@@ -707,7 +709,7 @@ class ITAdminDashboard extends Component {
                         <Col sm={5}><HighchartsReact highcharts={Highcharts} options={ResourcePie} /></Col>
                     </Row>
                     <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
-                        <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Resource Allocation Details</h3>
+                        <h3><FontAwesomeIcon icon={faTable} size="1x" style={{ marginRight: "1vw" }} />Top 10 Resource Allocation Details</h3>
                     </div>
                     <Row >
                         <Table striped hover variant="light">

@@ -42,6 +42,26 @@ const resourceAllocationSchema = mongoose.Schema({
 
 });
 
+
+
+resourceAllocationSchema.statics.update = async (req) => {
+
+
+  const result =  await User.findOne({'requestId' : req.body.requestId });
+
+  if(!result)
+    return result;
+
+  result.set(req.body);
+  const request = await result.save();
+
+  if(!request)
+    throw new Error({ message: "unable to update resource allocation request" });
+  
+    return request;
+
+};
+
 resourceAllocationSchema.statics.deallocate = async (req) => {
 
     const result =  await ResourceAllocation.findOne(req);
@@ -97,7 +117,14 @@ return result2;
 
 resourceAllocationSchema.statics.getAll = async (req) => {
 
-  const data = await ResourceAllocation.find(req.body).sort( { lastUpdatedAt : -1 } ).limit(30)
+  let data;
+
+  if(req.query.healthcareProvider) {
+     data = await ResourceAllocation.find({'healthcareProvider' : req.query.healthcareProvider}).sort( { lastUpdatedAt : -1 } ).limit(30)
+  }
+  else {
+    data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } ).limit(30)
+  }
 
   if (!data) {
     throw new Error({ error: "Couldn't get resource allocation details" });

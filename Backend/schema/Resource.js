@@ -139,10 +139,10 @@ resourceSchema.statics.availableResourceInfo = async (req) => {
 
   let result;
 
-  if(req.body.healthcareProvider) {
+  if(req.query.healthcareProvider) {
 
    result = await Resource.aggregate([
-    { "$match" : { "healthcareProvider" : req.body.healthcareProvider } },
+    { "$match" : { "healthcareProvider" : req.query.healthcareProvider } },
     {
       "$group": {
         "_id": "$type",
@@ -154,7 +154,7 @@ resourceSchema.statics.availableResourceInfo = async (req) => {
 
 }
 else {
-  
+
   result = await Resource.aggregate([
     {
       "$group": {

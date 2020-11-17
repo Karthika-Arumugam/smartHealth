@@ -133,9 +133,10 @@ userSchema.statics.findByCredentials = async (emailId, password) => {
   return user;
 };
 
-userSchema.statics.getProfile = async (emailId) => {
+userSchema.statics.getProfile = async (req) => {
   // Search for a user by email and password.
-  const user = await User.findOne({ emailId });
+  
+  const user = await User.findOne({  'emailId' : req.query.emailId });
   if (!user) {
     throw new Error({ error: "Invalid Details" });
   }

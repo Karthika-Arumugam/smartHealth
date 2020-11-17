@@ -13,7 +13,7 @@ class PatientProfile extends Component {
         this.state = {
             isSmoker: false,
             message: '',
-            isLogin: cookie.load('cookie') || "",
+            authToken: cookie.load('cookie') || "",
             firstName: "",
             lastName: "",
             emailId: "",
@@ -29,15 +29,18 @@ class PatientProfile extends Component {
     }
     async componentDidMount() {
         try {
-            const authToken = cookie.load('cookie') || '';
-            if (authToken) {
-                const response = await fetch(`/api/v1/users/profile`, {
+            this.setState({
+                authToken: cookie.load('cookie') || ''
+            })
+            if (this.state.authToken) {
+                const { emailId } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
+                const response = await fetch(`/api/v1/users/profile?emailId=${emailId}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
                     headers: {
                         'content-type': 'application/json',
-                        'Authorization': authToken
+                        'Authorization': this.state.authToken
                     },
                 });
 
@@ -125,7 +128,7 @@ class PatientProfile extends Component {
     render() {
         return (
             <Container className="parlex-back-signup">
-                {this.state.isLogin === false ? <Redirect to="/login" /> : ""}
+                {this.state.authToken === false ? <Redirect to="/login" /> : ""}
                 <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" />  Patient Profile</h2>
                 <Container style={{ width: "85%", margin: "0 auto" }}>
                     <Form onSubmit={this.onSubmit.bind(this)}>

@@ -44,7 +44,6 @@ class Resource extends Component {
         const newQty = parseInt(e.target.value);
         const newHealthcareList = JSON.parse(JSON.stringify(this.state.healthcarelist));
         newHealthcareList[index].totalCount = newQty;
-        // newHealthcareList[index].available = newQty;
         newHealthcareList[index].quantity = newQty;
         this.setState({ healthcarelist: newHealthcareList });
     }

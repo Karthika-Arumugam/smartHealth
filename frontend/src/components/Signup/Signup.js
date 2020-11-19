@@ -52,7 +52,8 @@ class Signup extends Component {
             ...(
                 this.state.userGroup === "Healthcare" ?
                     {
-                        healthCareProvider: providerName.value
+                        healthCareProvider: providerName.value,
+                        phone: phoneNumber.value
                     } : this.state.userGroup === "Patient" ?
                         {
                             gender: gender.value,
@@ -187,11 +188,13 @@ class Signup extends Component {
                         {this.state.userGroup === "Healthcare" ?
                             (
                                 <Row>
-                                    <Col md={3}></Col>
-                                    <Col md={6}>
+
+                                    <Col md={4}>
                                         <Form.Control name="providerName" type="text" placeholder="Provider Name" required />
                                     </Col>
-                                    <Col md={3}></Col>
+                                    <Col md={4}>
+                                        <Form.Control name="phoneNumber" type="tel" placeholder="Phone Number" />
+                                    </Col>
                                 </Row>
                             ) : (
                                 this.state.userGroup === "Patient" ?

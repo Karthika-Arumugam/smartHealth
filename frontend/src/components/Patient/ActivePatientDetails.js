@@ -15,7 +15,7 @@ class ActivePatientDetails extends Component {
             authFlag: cookie.load('cookie') || false,
             emailID: props.match.params.patientid,
             image: '/images/a2.jpg' || '',
-            healthcarelist: {}
+            patientDetails: {}
         }
         this.imageHandler = this.imageHandler.bind(this);
 
@@ -40,6 +40,7 @@ class ActivePatientDetails extends Component {
         try {
             const authToken = cookie.load('cookie') || '';
             if (authToken) {
+                // /api/v1/users/profile?emailId=${emailId}
                 const response = await fetch(`/api/v1/patient/morePatientInfo`, {
                     method: 'get',
                     mode: "cors",
@@ -51,7 +52,7 @@ class ActivePatientDetails extends Component {
                 });
                 if (response.status === 200) {
                     const patientList = await response.json();
-                    console.log("risk status", this.state.riskStatus);
+                    console.log("risk status", patientList);
                     //match the currStatus codes 0,1,2,3 with all,high,medium and low
                     switch (this.state.riskStatus) {
                         case 'all':
@@ -72,36 +73,34 @@ class ActivePatientDetails extends Component {
                         default:
                             this.setState({ currRisk: 4 });
                     }
-                    let patientDetailsArr = [];
-                    if (patientList && Array.isArray(patientList)) {
-                        if (this.state.riskStatus == "all") {
-                            patientDetailsArr = patientList;
-                        }
-                        else {
-                            patientDetailsArr = patientList.filter(ob => this.state.currRisk == ob.currRiskStatus);
-                        }
-                        console.log("response patient details", this.state.patientDetails);
 
-                        patientDetailsArr.forEach(patient => {
-                            switch (patient.currRiskStatus) {
-                                case 0:
-                                    patient.riskString = "Healthy";
-                                    break;
-                                case 1:
-                                    patient.riskString = "Low";
-                                    break;
-                                case 2:
-                                    patient.riskString = "Medium";
-                                    break;
-                                case 3:
-                                    patient.riskString = "High";
-                                    break;
-                                default:
-                            }
-                        })
+                    if (patientList && Array.isArray(patientList)) {
+                        let patientDeatils = patientList.filter(patient => this.state.emailID == patient.emailId);
+
+
+                        console.log("this.state.thispatient")
+                        switch (patientDeatils[0].currRiskStatus) {
+                            case 0:
+                                patientDeatils[0].riskString = "Healthy";
+                                break;
+                            case 1:
+                                patientDeatils[0].riskString = "Low";
+                                break;
+                            case 2:
+                                patientDeatils[0].riskString = "Medium";
+                                break;
+                            case 3:
+                                patientDeatils[0].riskString = "High";
+                                break;
+                            default:
+                        }
+                        console.log(patientDeatils[0]);
                         this.setState({
-                            patientDetails: patientDetailsArr
+                            patient: patientDeatils[0]
                         })
+
+                        console.log(this.state.patient)
+
                     }
                 }
             }
@@ -124,20 +123,20 @@ class ActivePatientDetails extends Component {
                     </div>
                     <Container className="recipes-list" >
 
-                        <article className="recipe">
-                            <h3 className="recipe-title"><b> Priya Khadke</b></h3>
+                        {this.state.patient ? <article className="recipe">
+                            <h3 className="recipe-title"><b> {this.state.patient.firstName} {this.state.patient.lastName} </b></h3>
                             <div className="recipe-detail">
-                                <h5><b>Current Risk Prediction</b> Healthy</h5>
+                                <h5><b>Current Risk Prediction</b> {this.state.patient.riskString}</h5>
                                 <div className="recipe-meta" >
-                                    <span className="calorie"><img src="/images/icon-envelope.png" alt="email" /><b>Email</b> priyakhadke15@gmail.com</span>
-                                    <span className="calorie"><img src="/images/icon-phone.png" alt="contact" /><b>Contact Number</b> 9890467672</span>
+                                    <span className="calorie"><img src="/images/icon-envelope.png" alt="email" /><b>Email</b> {this.state.patient.emailId} </span>
+                                    <span className="calorie"><img src="/images/icon-phone.png" alt="contact" /><b>Contact Number</b> {this.state.patient.phone} </span>
                                 </div>
                                 <div className="recipe-meta">
-                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="gender" /><b>Gender</b> Female</span>
-                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="age" /><b>Age</b> 30</span>
+                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="gender" /><b>Gender</b> {this.state.patient.gender} </span>
+                                    <span className="calorie"><img src="/images/icon-pie-chart.png" alt="age" /><b>Age</b> {this.state.patient.age}</span>
                                 </div>
                             </div>
-                        </article>
+                        </article> : ""}
                     </Container>
                 </Container>
                 <p>{this.state.message}</p>

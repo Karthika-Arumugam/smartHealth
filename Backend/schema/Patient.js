@@ -155,7 +155,19 @@ const patientSchema = mongoose.Schema({
     type : Boolean,
     required : true,
     default : false
-  } 
+  },
+
+
+  smokingyears : {
+    type : Number,
+    required : false
+  },
+
+  cigperday : {
+    type : Number,
+    required : false
+  }
+
 });
 
 patientSchema.pre("save", async function (next) {
@@ -169,8 +181,8 @@ patientSchema.statics.getDashboard = async (emailId) => {
   // get patient dashboard details  by email 
   const patient = await Patient.findOne({ emailId });
 
-  patient.riskStatus = patient.riskStatus.reverse().splice(0,20);
-  patient.time = patient.time.reverse().splice(0,20);
+  // patient.riskStatus = patient.riskStatus.reverse().splice(0,20);
+  // patient.time = patient.time.reverse().splice(0,20);
 
   
   if (!patient) {
@@ -186,7 +198,8 @@ patientSchema.statics.updateRiskStatus = async (emailId,riskStatus) => {
   var set = {
     emailId : emailId,
     riskStatus : [...patient.riskStatus,riskStatus],
-    time : [...patient.time,new Date()]
+    time : [...patient.time,new Date()],
+    currRiskStatus : riskStatus
 }
 
   if (!patient) {

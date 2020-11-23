@@ -105,7 +105,7 @@ class Signup extends Component {
                     <Form onSubmit={this.onSubmit.bind(this)}>
                         <Row className="signup-row">
                             <Col md={6}>
-                                <Form.Control name="firstname" type="text" placeholder="First Name" autofocus required />
+                                <Form.Control name="firstname" type="text" placeholder="First Name" autoFocus required />
                             </Col>
                             <Col md={6}>
                                 <Form.Control name="lastname" type="text" placeholder="Last Name" required />

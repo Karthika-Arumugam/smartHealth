@@ -174,6 +174,18 @@ userSchema.statics.updateProfile = async (req) => {
 
 };
 
+userSchema.statics.userDetails = async (req) => {
+
+  let email = req.emailId;
+
+  const result =  await User.findOne({'emailId' : email },{emailId : 1, age : 1, gender : 1, smokingyears: 1, cigperday:1});
+
+    return result;
+
+};
+
+
+
 userSchema.statics.healthcareInfo = async (req) => {
 
   console.log("inside")

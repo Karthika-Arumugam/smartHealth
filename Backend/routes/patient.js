@@ -183,6 +183,32 @@ router.get("/morePatientInfo", async (req, res) => {
   }
 });
 
+router.get("/morePatientInfoAboutActive", async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+
+  try {
+    const result = await Patient.activatedDevices(req);
+    let ans = [];
+ 
+    for(let user in result) {
+   
+      let patient = await User.userDetails(result[user]);
+       ans.push(patient);
+    }
+
+
+    if (!ans)
+      return res.status(400).json({ message: "Invalid details" });
+     console.log(ans);
+    res.json(ans);
+  } catch (error) {
+    res.status(400).send({ message: "Server error! Unable to get patient info" });
+  }
+});
+
 
 
 module.exports = router;

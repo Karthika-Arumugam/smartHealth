@@ -298,6 +298,21 @@ patientSchema.statics.activeDevicesCount = async (req) => {
     
     };
 
+
+  patientSchema.statics.activatedDevices = async (req) => {
+
+    // Fields required from api are patients name, age, gender, contact no, latest risk prediction
+
+    let result =  Patient.find({deviceStatus : true}, {emailId : 1});
+
+    if(!result)
+      throw new Error({ error: "Invalid input details" });
+  
+    console.log("Result is " + result)
+    return result;
+    
+    };
+
 const Patient = mongoose.model("Patient", patientSchema, "Patient");
 
 module.exports = Patient;

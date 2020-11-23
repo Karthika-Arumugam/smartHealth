@@ -3,10 +3,24 @@ const ResourceAllocation = require("../schema/ResourceAllocation");
 const Resource = require("../schema/Resource");
 const router = express.Router();
 
+router.post('/add', async (req, res) => {
+
+  if (!(req.cookies.cookie)) {
+    return res.status(401).json({ message: "You are not logged in,please login to continue" });
+  }
+  // Create a new  Resource Allocation
+  try {
+    const data = new ResourceAllocation(req.body);
+    await data.save();
+
+    res.status(201).send({ message : "Resource Allocation saved successfully" });
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({ message: error.message});
+  }
+});
+
 router.post('/allocate', async (req, res) => {
-    if (!(req.cookies.cookie)) {
-        return res.status(401).json({ message: "You are not logged in,please login to continue" });
-      }
       // update resource
       let resource;
       try {
@@ -72,6 +86,23 @@ router.post('/deallocate', async (req, res) => {
       }
   });
 
+  router.post("/update", async (req, res) => {
+
+    if (!(req.cookies.cookie)) {
+      return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    }
+    // update user profile
+    let resource ;
+    try {
+   
+      resource= await ResourceAllocation.update(req);
+      res.json({ message: " resource request updated successfully"});
+  
+  
+    } catch (error) {
+      return res.status(500).json({ message: "Unable to update resource allocation"});
+    }
+  });
 
 
 

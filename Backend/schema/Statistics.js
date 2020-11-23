@@ -84,7 +84,7 @@ statisticsSchema.statics.update = async (req) => {
 
     const allocated =  await Statistics.countDocuments({'status' : 'completed'});
     console.log(allocated)
-    const waiting =  await Statistics.countDocuments({'status' : 'waiting'});
+    const waiting =  await Statistics.countDocuments({'status' : 'pending'});
     const queued =  await Statistics.countDocuments({'status' : 'queued'});
 
    const efficiency = allocated/(allocated+waiting+queued) ;

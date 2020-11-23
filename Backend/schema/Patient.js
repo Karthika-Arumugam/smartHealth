@@ -289,7 +289,17 @@ patientSchema.statics.activeDevicesCount = async (req) => {
 
     // Fields required from api are patients name, age, gender, contact no, latest risk prediction
 
-    let result =  Patient.find({deviceStatus : true}, {emailId : 1, age : 1, gender : 1, firstName : 1, lastName : 1, phone : 1, currRiskStatus : 1});
+    let result;
+
+    if(req.query.healthcareProvider) {
+
+    result =  Patient.find({deviceStatus : true, 'healthcareProvider' : req.query.healthcareProvider }, {emailId : 1, age : 1, gender : 1, firstName : 1, lastName : 1, phone : 1, currRiskStatus : 1});
+
+    }
+
+    else {
+      result =  Patient.find({deviceStatus : true}, {emailId : 1, age : 1, gender : 1, firstName : 1, lastName : 1, phone : 1, currRiskStatus : 1});
+    }
 
     if(!result)
       throw new Error({ error: "Invalid input details" });

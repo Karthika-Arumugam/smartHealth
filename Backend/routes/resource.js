@@ -99,7 +99,7 @@ router.delete('/delete', async (req, res) => {
       // get all resources
       let resource,result;
       try {
-        resource  = await Resource.availableResourceInfo(req);
+      resource  = await Resource.availableResourceInfo(req);
         result = JSON.parse(JSON.stringify(resource));
         res.json(result);
 

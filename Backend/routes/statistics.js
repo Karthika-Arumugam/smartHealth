@@ -6,6 +6,7 @@ const router = express.Router();
 router.post('/add', async (req, res) => {
 
   if (!(req.cookies.cookie)) {
+    console.log("cookie not there")
     return res.status(401).json({ message: "You are not logged in,please login to continue" });
   }
   // Create a new statistic record
@@ -21,9 +22,9 @@ router.post('/add', async (req, res) => {
 
 router.post('/update', async (req, res) => {
 
-    if (!(req.cookies.cookie)) {
-        return res.status(401).json({ message: "You are not logged in,please login to continue" });
-      }
+    // if (!(req.cookies.cookie)) {
+    //     return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    //   }
 
       let statistic;
       try {

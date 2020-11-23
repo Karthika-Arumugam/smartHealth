@@ -23,17 +23,22 @@ router.get('/dashboard', async (req, res) => {
 
     let patient = await Patient.getDashboard(user.emailId);
     let heartRatesData = await SimulatedData.getHeartrate(user.emailId);
-    let deviceName = await User.getDeviceName(user.emailId);
+    let deviceName = "Simulator"
 
     let heartRates = [];
     heartRatesData.forEach(element => {
-      heartRates.push(element.heartRate)
+      heartRates.push(element.trestbps)
+    });
+
+    let riskStatus = [];
+    heartRatesData.forEach(element => {
+      riskStatus.push(element.risk_factor)
     });
 
 
 
     let result = JSON.parse(JSON.stringify(patient));
-    result = { ...result, heartRates: heartRates, deviceName: deviceName };
+    result = { ...result, heartRates: heartRates, riskStatus : riskStatus, deviceName: deviceName };
     res.json(result);
 
   } catch (error) {

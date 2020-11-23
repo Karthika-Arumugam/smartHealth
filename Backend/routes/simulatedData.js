@@ -2,6 +2,7 @@ const express = require("express");
 const SimulatedData = require("../schema/SimulatedData");
 const auth = require("../middleware/auth");
 const { JWT_KEY} = require('../config.js');
+const Patient = require("../schema/Patient");
 
 const jwt = require("jsonwebtoken");
 
@@ -14,6 +15,8 @@ router.post('/add', async (req, res) => {
   try {
     const data = new SimulatedData(req.body);
     await data.save();
+    await Patient.updateRiskStatus(req.body.emailId, req.body.risk_factor);
+
 
     res.status(201).send({ message : "Simulated Data saved successfully" });
   } catch (error) {

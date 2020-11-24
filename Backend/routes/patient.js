@@ -190,10 +190,6 @@ router.get("/morePatientInfo", async (req, res) => {
 
 router.get("/morePatientInfoAboutActive", async (req, res) => {
 
-  if (!(req.cookies.cookie)) {
-    return res.status(401).json({ message: "You are not logged in,please login to continue" });
-  }
-
   try {
     const result = await Patient.activatedDevices(req);
     let ans = [];

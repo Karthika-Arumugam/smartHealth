@@ -8,13 +8,7 @@ const simulatedDataSchema = mongoose.Schema({
 
   emailId: {
     type: String,
-    required: true,
-    lowercase: true,
-    validate: (value) => {
-      if (!validator.isEmail(value)) {
-        throw new Error({ error: "Invalid Email address" });
-      }
-    },
+    required: false
   },
 
   time: {
@@ -87,54 +81,54 @@ const simulatedDataSchema = mongoose.Schema({
    required: false
   },
 
-  Pro : {
+  pro : {
     type: Number,
     required: false
   },
 
-  Chol : {
+  chol : {
     type: Number,
    required: false
   },
 
-  Fbs : {
+  fbs : {
     type: Number,
     required: false
   },
 
-  Thalach : {
+  thalach : {
     type: Number,
    required: false
   },
 
-  Thalrest : {
+  thalrest : {
     type: Number,
     required: false
   },
 
 
 
-  Tpeakbps : {
+  tpeakbps : {
     type: Number,
     required: false
   },
 
-  Tpeakbpd : {
+  tpeakbpd : {
     type: Number,
    required: false
   },
 
-  Trestbpd : {
+  trestbpd : {
     type: Number,
     required: false
   },
 
-  Thaldur : {
+  thaldur : {
     type: Number,
    required: false
   },
 
-  Met : {
+  met : {
     type: Number,
     required: false
   },
@@ -144,22 +138,22 @@ const simulatedDataSchema = mongoose.Schema({
     required: false
   },
 
-  Xhypo : {
+  xhypo : {
     type: Number,
    required: false
   },
 
-  Old_peak : {
+  old_peak : {
     type: Number,
     required: false
   },
 
-  Slope : {
+  slope : {
     type: Number,
    required: false
   },
 
-  Rldv5 : {
+  rldv5 : {
     type: Number,
     required: false
   },
@@ -167,12 +161,12 @@ const simulatedDataSchema = mongoose.Schema({
 
 
 
-  Rldv5e : {
+  rldv5e : {
     type: Number,
     required: false
   },
 
-  Cp_encoded : {
+  cp_encoded : {
     type: Number,
    required: false
   },
@@ -207,6 +201,10 @@ const simulatedDataSchema = mongoose.Schema({
     required: false
   },
 
+  deviceId : {
+    type: String,
+    required: false
+  },
  
 
   relrest : {
@@ -229,22 +227,17 @@ const simulatedDataSchema = mongoose.Schema({
     required: false
   },
 
-  Age : {
+  age : {
     type: Number,
    required: false
   },
 
-  Sex : {
+  sex : {
     type: Number,
     required: false
   },
 
-  PatientId : {
-    type: String,
-   required: false
-  },
-
-  Trestbps : {
+  trestbps : {
     type: Number,
     required: false
   },
@@ -314,7 +307,7 @@ simulatedDataSchema.pre("save", async function (next) {
 
 simulatedDataSchema.statics.getHeartrate = async (emailId) => {
   // get heartbeat data details  by email 
-  const data = await  SimulatedData.find({ emailId },{   heartRate : 1}).sort({ time : -1}).limit(20);
+  const data = await  SimulatedData.find({ emailId },{  risk_factor : 1,  trestbps : 1}).sort({ time : -1}).limit(20);
   
   if (!data) {
     throw new Error({ error: "Invalid Details" });

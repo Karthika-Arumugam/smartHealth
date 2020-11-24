@@ -24,6 +24,8 @@ router.post('/signup', async (req, res) => {
         gender : req.body.gender,
         phone : req.body.phone,
         currRiskStatus: 0,  
+        smokingyears : req.body.smokingyears,
+        cigperday : req.body.cigperday,
         healthcareProvider : req.body.healthcareProvider,
         time : new Date()});
 

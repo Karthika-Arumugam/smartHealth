@@ -60,7 +60,7 @@ router.delete('/delete', async (req, res) => {
     }
   });
 
-  router.get('/getAvailability', async (req, res) => {
+  router.post('/getAvailability', async (req, res) => {
     if (!(req.cookies.cookie)) {
         return res.status(401).json({ message: "You are not logged in,please login to continue" });
       }

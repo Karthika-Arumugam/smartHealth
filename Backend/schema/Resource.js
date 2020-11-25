@@ -39,12 +39,12 @@ const resourceSchema = mongoose.Schema({
 
 resourceSchema.statics.getAvailability = async (req) => {
   // get available resources count
-  const data = await Resource.findOne({ 'type': req.type, 'healthcareProvider': req.healthcareProvider });
+  const data = await Resource.findOne({ 'type': req.type, 'healthcareProvider': req.healthcareProvider },{available : 1});
 
   if (!data) {
     throw new Error({ error: "Invalid resource details" });
   }
-  return data;
+  return data.available;
 };
 
 resourceSchema.statics.getAll = async (req) => {

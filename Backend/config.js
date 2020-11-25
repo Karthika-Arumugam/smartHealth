@@ -3,7 +3,7 @@ module.exports = {
     JWT_KEY: 'WinterIsComingGOT2019',
     PORT: '3001',
 
-    edge_connString: "HostName=IOTSmartHealth.azure-devices.net;DeviceId=DownStreamSimulator;SharedAccessKeyName=service;SharedAccessKey=XFPFND7sPo0yyXTFRUyMQGnoTg8e/vV3od/9uh/Ek4I=",
+    edge_connString: "HostName=IOTEdgeSmartHealth.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=iVZ6aL+EFg+HkcFp6V2gcBONcd8/YoCr30ysKj2V5TY=",
     edge_targetDevice: "DownStreamSimulator",
 
 };

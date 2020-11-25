@@ -170,7 +170,7 @@ class ActivePatient extends Component {
                         this.state.patientDetails.map((ob, index) => (
                             <Container className="recipes-list" key={index}>
                                 <article className="recipe">
-                                    <figure className="recipe-image"><img src="/images/photo-3.jpg" alt="Resource Icon" /></figure>
+                                    <figure className="recipe-image"><img src="/images/profile.png" alt="Resource Icon" /></figure>
                                     <div className="recipe-detail">
                                         <h3 className="recipe-title"><Link to={`/activepatientdetails/${ob.emailId}`}><b> {ob.firstName} {ob.lastName}</b></Link></h3>
                                         <h5><b>Risk Prediction</b> {ob.riskString}</h5>

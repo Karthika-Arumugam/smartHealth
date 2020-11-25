@@ -47,7 +47,7 @@ class SiteHeader extends Component {
                 <Nav className="mr-auto">
                     {this.state.isLoggedIn === true && this.state.usergroup === 'Patient' ? <Nav.Link href="/patientdash"><b>Dashboard</b></Nav.Link> : this.state.usergroup === 'Admin' ? <Nav.Link href="/admindash"><b>Dashboard</b></Nav.Link> : this.state.usergroup === 'Healthcare' ? <Nav.Link href="/healthdash"><b>Dashboard</b></Nav.Link> : ""}
                     {this.state.isLoggedIn === true && this.state.usergroup === 'Patient' ? <Nav.Link href="/patientprof"><b>Profile</b></Nav.Link> : this.state.usergroup === 'Admin' ? <Nav.Link href="/adminprof"><b>Profile</b></Nav.Link> : this.state.usergroup === 'Healthcare' ? <Nav.Link href='/healthcareprof'><b>Profile</b></Nav.Link> : ""}
-                    {this.state.isLoggedIn === true && this.state.usergroup === 'Admin' || this.state.usergroup === 'Healthcare' ? <Nav.Link href='/resource/:providerName'><b>Resource</b></Nav.Link> : ""}
+                    {/* {this.state.isLoggedIn === true && this.state.usergroup === 'Admin' || this.state.usergroup === 'Healthcare' ? <Nav.Link href='/resource/:providerName'><b>Resource</b></Nav.Link> : ""} */}
                     {this.state.isLoggedIn === true && this.state.usergroup === 'Healthcare' ? <Nav.Link href="/activepatient/all"><b>Patients</b></Nav.Link> : ""}
                     {this.state.isLoggedIn === false ? <Nav.Link href="/login"><b>Login</b></Nav.Link> : <Nav.Link onClick={() => cookie.remove('cookie', { path: '/' })} href="/"><b>Logout</b></Nav.Link>}
                 </Nav>

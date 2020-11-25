@@ -334,11 +334,6 @@ class HealthCareDashboard extends Component {
                     ['Monitoring', Number(this.state.MonitoringPie)],
                     ['Medical Prescription', Number(this.state.PrescriptionPie)],
                     ['Equipment', Number(this.state.EquipmentPie)]
-                    // ['Ambulance', 19],
-                    // ['Cardiologist', 38],
-                    // ['Monitoring', 19],
-                    // ['Medical Prescription', 10],
-                    // ['Equipment', 40]
                 ]
             }]
         }
@@ -356,7 +351,7 @@ class HealthCareDashboard extends Component {
                             <td>{key.patient}</td>
                             <td>{dateString}</td>
                             <td>{key.status}</td>
-                            <td><Link to={`/resource/${key.healthcareProvider}`}><Button variant="info" >Manage</Button></Link></td>
+                            <td><Link to={`/resource/${this.state.healthCareProvider}`}><Button variant="info" >Manage</Button></Link></td>
                         </tr>
                     )
                 }

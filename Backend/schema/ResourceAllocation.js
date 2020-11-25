@@ -11,8 +11,7 @@ const resourceAllocationSchema = mongoose.Schema({
 
   requestId : {
     type: Number,
-    required: true,
-    unique : true
+    required: true
   },
 
   healthRisk : {
@@ -47,7 +46,7 @@ const resourceAllocationSchema = mongoose.Schema({
 resourceAllocationSchema.statics.update = async (req) => {
 
 
-  const result =  await User.findOne({'requestId' : req.body.requestId });
+  const result =  await ResourceAllocation.findOne({'requestId' : req.body.requestId , 'resourceType' : req.body.resourceType });
 
   if(!result)
     return result;

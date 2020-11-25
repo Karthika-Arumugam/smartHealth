@@ -25,9 +25,9 @@ router.post('/allocate', async (req, res) => {
       let resource;
       try {
        resource= await Resource.decrement(req.body);
-        resource = new ResourceAllocation(req.body);
-        await resource.save();
-        res.status(201).send({ message : "Resource saved successfully" });
+      //  resource= await ResourceAllocation.update(req);
+      res.json({ message: " resource request updated successfully"});
+    
       } catch (error) {
         console.log(error)
         return res.status(400).json({ message: "Invalid resource details"});

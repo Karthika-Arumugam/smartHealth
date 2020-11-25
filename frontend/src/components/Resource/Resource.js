@@ -180,30 +180,43 @@ class Resource extends Component {
     }
     async componentDidMount() {
         try {
-            const authToken = cookie.load('cookie') || '';
-            if (authToken) {
-                const response = await fetch(`/api/v1/resource/all?healthcareProvider=${this.state.providerName}`, {
-                    method: 'get',
-                    mode: "cors",
-                    redirect: 'follow',
-                    headers: {
-                        'content-type': 'application/json',
-                        'Authorization': authToken
-                    },
-                });
-                if (response.status === 200) {
-                    const body1 = await response.json();
-                    if (body1 && Array.isArray(body1)) {
-                        body1.forEach(ob => ob.quantity = ob.totalCount);
-                        this.setState({
-                            healthcarelist: body1,
-                            deltaObj: body1
-                        });
+            this.setState({
+                authFlag: cookie.load('cookie') || false
+            }, async () => {
+                if (this.state.authFlag) {
+
+                    const { userGroup } = JSON.parse(window.atob(this.state.authFlag.split('.')[1]));
+                    this.setState({
+                        userGroup: userGroup
+                    })
+
+                    const response = await fetch(`/api/v1/resource/all?healthcareProvider=${this.state.providerName}`, {
+                        method: 'get',
+                        mode: "cors",
+                        redirect: 'follow',
+                        headers: {
+                            'content-type': 'application/json',
+                            'Authorization': this.state.authFlag
+                        },
+                    });
+                    if (response.status === 200) {
+                        const body1 = await response.json();
+                        if (body1 && Array.isArray(body1)) {
+                            body1.forEach(ob => ob.quantity = ob.totalCount);
+                            this.setState({
+                                healthcarelist: body1,
+                                deltaObj: body1
+                            });
+                        }
                     }
                 }
-            }
-            else
-                this.setState({ message: "Session expired login to continue" });
+                else
+                    this.setState({ message: "Session expired login to continue" });
+
+            })
+
+
+
         } catch (e) {
             this.setState({ message: e.message || e });
         }
@@ -273,14 +286,14 @@ class Resource extends Component {
                 <Container className="resource-row">
                     {this.state.authFlag && this.state.usergroup === 'Patient' ? <Redirect to="/patientdash" /> : this.state.authFlag && this.state.usergroup === 'Healthcare' ? <Redirect to="/healthdash" /> : this.state.authFlag && this.state.usergroup === 'Admin' ? <Redirect to="/admindash" /> : ""}
                     <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Resources</h2>
-                    <Form onSubmit={this.searchHandler.bind(this)}>
+                    {this.state.userGroup === "Admin" ? <Form onSubmit={this.searchHandler.bind(this)}>
                         <Container className="recipes-list">
                             <span className="recipe-title" >
                                 <input type="text" name="searchText" placeholder="Search Health Care Provider" style={{ width: "50%", height: "50px", margin: "10px" }} required autoFocus />
                                 <input type="submit" className="btn btn-info btn-lg" value="Search" style={{ margin: "5px" }} />
                             </span>
                         </Container>
-                    </Form>
+                    </Form> : null}
                     {Array.isArray(this.state.healthcarelist) ? (
                         this.state.healthcarelist.map((ob, index) => (
                             <Container className="recipes-list" key={index}>
@@ -292,59 +305,27 @@ class Resource extends Component {
                                         <div className="recipe-meta" >
                                             <span className="time"><img src="/images/tag-1.png" alt="Total" />Total Count {ob.totalCount}</span>
                                             <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
-                                            <span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min={ob.available} defaultValue={ob.quantity} />
-                                            </span>
-                                            <span className="contact-form" >
-                                                <input type="button" className="btn btn-info" onClick={() => this.updateHandler(index)()} value="Update" style={{ margin: "5px" }} />
-                                            </span>
-                                            <span className="contact-form" >
-                                                <input type="button" className="btn btn-danger" onClick={this.deleteHandler(ob)} value="Delete" style={{ margin: "5px" }} />
-                                            </span>
+                                            {this.state.userGroup === "Admin" ?
+                                                (<span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min={ob.available} defaultValue={ob.quantity} />
+                                                </span>) : (<span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" defaultValue={ob.quantity} readOnly />
+                                                </span>)}
+                                            {this.state.userGroup === "Admin" ?
+                                                (<span>
+                                                    <span className="contact-form" >
+                                                        <input type="button" className="btn btn-info" onClick={() => this.updateHandler(index)()} value="Update" style={{ margin: "5px" }} />
+                                                    </span>
+                                                    <span className="contact-form" >
+                                                        <input type="button" className="btn btn-danger" onClick={this.deleteHandler(ob)} value="Delete" style={{ margin: "5px" }} />
+                                                    </span>
+                                                </span>)
+                                                : null}
                                         </div>
                                     </div>
                                 </article>
                             </Container>
                         ))
                     ) : null}
-                    {/* <Container className="recipes-list">
-                        <article className="recipe">
-                            <figure className="recipe-image"><img src={this.state.healthcarelist.image} alt="Resource Icon" /></figure>
-                            <div className="recipe-detail">
-                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
-                                <h5><b>Resource Type</b> {this.state.healthcarelist.type}</h5>
-                                <div className="recipe-meta" >
-                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
-                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
-                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
-                                        <input style={{ width: "100px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
-                                    </span>
-                                    <span className="contact-form" >
-                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    </Container> */}
-                    {/* <Container className="recipes-list">
-                        <article className="recipe">
-                            <figure className="recipe-image"><img src='/images/a4.jpg' alt="Resource Icon" /></figure>
-                            <div className="recipe-detail">
-                                <h3 className="recipe-title"><b>Provider Name</b> {this.state.healthcarelist.healthcareProvider}</h3>
-                                <h5><b>Resource Type</b> Ambulance</h5>
-                                <div className="recipe-meta" >
-                                    <span className="time"><img src="/images/tag-1.png" />Total Count {this.state.healthcarelist.totalCount}</span>
-                                    <span className="time"><img src="/images/tag.png" />Available {this.state.healthcarelist.available}</span>
-                                    <span className="time" ><img src="/images/icon-pie-chart@2x.png" />Last Updated Date {this.state.healthcarelist.createdDate}
-                                        <input style={{ width: "100px" }} type="number" onChange={this.changeQuantity()} min="0" defaultValue="0" />
-                                    </span>
-                                    <span className="contact-form" >
-                                        <input type="button" className="btn btn-info" value="Update Resources" style={{ marginTop: "5px" }} />
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    </Container> */}
-                    <Container className="recipes-list" >
+                    {this.state.userGroup === "Admin" ? <Container className="recipes-list" >
                         <h4 style={{ marginTop: "5vh" }} >Add New Resource Type</h4>
                         <Form onSubmit={this.addHandler()}>
                             <Row style={{ padding: "50px" }}>
@@ -369,7 +350,7 @@ class Resource extends Component {
                                 <Col md={2}><Button variant="success" type="submit" style={{ marginRight: "2vw" }}>Add</Button></Col>
                             </Row>
                         </Form>
-                    </Container>
+                    </Container> : null}
                 </Container>
                 <p>{this.state.message}</p>
             </Container>

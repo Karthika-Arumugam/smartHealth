@@ -210,6 +210,19 @@ router.get("/morePatientInfoAboutActive", async (req, res) => {
   }
 });
 
+router.get('/getHealthcare', async (req, res) => {
+  if (!(req.cookies.cookie)) {
+      return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    }
+    // get healthcare
+    let healthcare;
+    try {
+      healthcare  = await Patient.getHealthcare(req);
+      res.json(healthcare);
 
+    } catch (error) {
+      res.status(400).send({ message: "Error !Unable to fetch healthcare"});
+    }
+});
 
 module.exports = router;

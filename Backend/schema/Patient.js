@@ -336,6 +336,18 @@ patientSchema.statics.activeDevicesCount = async (req) => {
     
     };
 
+    
+    patientSchema.statics.getHealthcare = async (req) => {
+  
+      let result = await Patient.findOne({ 'emailId' : req.query.emailId }, {healthcareProvider : 1});
+  
+      if(!result)
+        throw new Error({ error: "Invalid input details" });
+        
+      return result.healthcareProvider;
+      
+      };
+
 const Patient = mongoose.model("Patient", patientSchema, "Patient");
 
 module.exports = Patient;

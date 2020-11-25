@@ -218,7 +218,7 @@ router.get('/getHealthcare', async (req, res) => {
     let healthcare;
     try {
       healthcare  = await Patient.getHealthcare(req);
-      res.json(healthcare);
+      res.json(JSON.parse(JSON.stringify(healthcare)));
 
     } catch (error) {
       res.status(400).send({ message: "Error !Unable to fetch healthcare"});

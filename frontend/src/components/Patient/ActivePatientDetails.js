@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Form, Button, Container, Col, Row } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { faHeartbeat } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from 'react-router-dom';
+
 import './ActivePatient.css'
 import cookie from 'react-cookies';
-import { isArray } from 'highcharts';
+
 
 class ActivePatientDetails extends Component {
     constructor(props) {
@@ -40,7 +40,8 @@ class ActivePatientDetails extends Component {
         try {
             const authToken = cookie.load('cookie') || '';
             if (authToken) {
-                // /api/v1/users/profile?emailId=${emailId}
+                // check if usergroup is Health Care Provider, if yes then add query params
+
                 const response = await fetch(`/api/v1/patient/morePatientInfo`, {
                     method: 'get',
                     mode: "cors",

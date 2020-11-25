@@ -463,14 +463,6 @@ class PatientDashboard extends Component {
                 {this.state.authToken ? <Container>
                     <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', minHeight: '100px', }}>
                         <h2 ><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />Patient Dashboard</h2>
-                        {/* <Toast style={{ position: 'absolute', top: 0, right: 0, }}>
-                        <Toast.Header>
-                            <img src="holder.js/20x20?text=%20" className="rounded mr-2" alt="" />
-                            <strong className="mr-auto">Recommended</strong>
-                            <small> just now</small>
-                        </Toast.Header>
-                        <Toast.Body>See? Just like this.</Toast.Body>
-                    </Toast> */}
                     </div>
                     <Row style={{ width: '100%', margin: "0px 0px 0px 0px" }}>
                         <Row className='text-stats-panel' style={{ width: '100%' }}>
@@ -503,7 +495,7 @@ class PatientDashboard extends Component {
                         <Col><HighchartsReact highcharts={Highcharts} options={RiskAggregate} /></Col>
                     </Row>
                     <HighchartsReact highcharts={Highcharts} options={heartRate} />
-                    <HighchartsReact highcharts={Highcharts} options={healthstats2Risk} />
+                    {/* <HighchartsReact highcharts={Highcharts} options={healthstats2Risk} /> */}
                 </Container> : ""}
                 <p>{this.state.message}</p>
             </Container>

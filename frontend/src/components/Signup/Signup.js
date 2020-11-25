@@ -15,6 +15,7 @@ class Signup extends Component {
             userGroup: '',
             message: '',
             isLogin: cookie.load('cookie') || "",
+            healthCareProvider: []
         };
     }
 
@@ -37,7 +38,7 @@ class Signup extends Component {
 
     onSubmit = async e => {
         e.preventDefault();
-        const { firstname, lastname, email, password, age, phoneNumber, emergencyContact, gender, address, city, state, zipcode, providerName } = e.target.elements;
+        const { firstname, lastname, email, password, age, phoneNumber, emergencyContact, gender, address, city, state, zipcode, providerName, healthcareProvider } = e.target.elements;
         const person = {
             firstName: firstname.value,
             lastName: lastname.value,
@@ -60,6 +61,7 @@ class Signup extends Component {
                             phone: phoneNumber.value,
                             age: age.value,
                             emergencyContact: emergencyContact.value,
+                            healthCareProvider: healthcareProvider.value,
                         } : this.state.userGroup === "Admin" ?
                             {
                                 phone: phoneNumber.value
@@ -88,6 +90,33 @@ class Signup extends Component {
             this.setState({ message: e.message || e });
         }
     };
+
+    async componentDidMount() {
+
+        const response = await fetch(`/api/v1/users/allHealthcare`, {
+            method: 'get',
+            mode: "cors",
+            redirect: 'follow',
+            headers: {
+                'content-type': 'application/json',
+            },
+        });
+        if (response.status === 200) {
+            const body = await response.json();
+            if (body) {
+                this.setState({
+                    healthCareProvider: body
+                });
+                console.log(this.state.healthCareProvider)
+
+
+
+
+            }
+
+        }
+
+    }
 
     render() {
         return (
@@ -200,10 +229,10 @@ class Signup extends Component {
                                 this.state.userGroup === "Patient" ?
                                     (
                                         <Row className="signup-row">
-                                            <Col md={4}>
+                                            <Col md={3}>
                                                 <Form.Control name="phoneNumber" type="tel" placeholder="Phone Number" />
                                             </Col>
-                                            <Col md={4}>
+                                            <Col md={3}>
                                                 <Form.Control name="emergencyContact" type="tel" placeholder="Emergency Contact" required />
                                             </Col>
                                             <Col md={2}>
@@ -215,6 +244,15 @@ class Signup extends Component {
                                             </Col>
                                             <Col md={2}>
                                                 <Form.Control name="age" type="number" min="0" max="150" placeholder="Age" required />
+                                            </Col>
+                                            <Col md={2}>
+                                                <Form.Control name="healthcareProvider" as="select" required>
+                                                    {Array.isArray(this.state.healthCareProvider) ? (
+                                                        this.state.healthCareProvider.map((elem, index) => (
+                                                            <option key={index} value={elem}>{elem}</option>
+                                                        ))
+                                                    ) : null}
+                                                </Form.Control>
                                             </Col>
                                         </Row>
                                     ) :

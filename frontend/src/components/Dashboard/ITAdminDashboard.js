@@ -696,7 +696,7 @@ class ITAdminDashboard extends Component {
                         <h2><FontAwesomeIcon icon={faHeartbeat} size="1x" style={{ marginRight: "1vw" }} />IT Admin Dashboard</h2>
                     </div>
                     <Row>
-                        <Col><h1><Badge variant="info">Active Devices<br></br><br></br>{this.state.deviceCount}<br></br><br></br><h6> <Link to="/activepatient/all">more info</Link></h6></Badge></h1></Col>
+                        <Col><h1><Badge variant="success">Active Devices<br></br><br></br>{this.state.deviceCount}<br></br><br></br><h6> <Link to="/activepatient/all">more info</Link></h6></Badge></h1></Col>
                     </Row>
                     <Row >
                         <Col><HighchartsReact highcharts={Highcharts} options={allocstatus} /></Col>

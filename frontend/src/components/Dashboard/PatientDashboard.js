@@ -52,8 +52,8 @@ class PatientDashboard extends Component {
                     if (body) {
                         console.log(body);
                         for (let index in body.time) {
-                            heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
-                            // heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
+                            // heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
                             riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
                             body.riskStatus[index] > 2 ? highRiskCount++ : lowRiskcount++;
                         }

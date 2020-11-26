@@ -38,7 +38,7 @@ class PatientDashboard extends Component {
             if (this.state.authToken) {
                 const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
 
-                const response = await fetch(`/api/v1/patient/dashboard`, {
+                const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -52,10 +52,10 @@ class PatientDashboard extends Component {
                     if (body) {
                         console.log(body);
                         for (let index in body.time) {
-                            // heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
-                            heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
+                            heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            // heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
                             riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
-                            body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
+                            body.riskStatus[index] > 2 ? highRiskCount++ : lowRiskcount++;
                         }
                         const total = highRiskCount + lowRiskcount;
                         this.setState({
@@ -67,8 +67,30 @@ class PatientDashboard extends Component {
                                 High: (highRiskCount / total) * 100,
                                 Low: (lowRiskcount / total) * 100
                             },
-                            deviceStatus: body.deviceStatus
+                            deviceStatus: body.deviceStatus,
+                            currRiskStatus: Number(body.currRiskStatus)
                         })
+                        let currRiskString = "";
+                        switch (Number(body.currRiskStatus)) {
+                            case 0:
+                                currRiskString = "Healthy"
+                                break;
+                            case 1:
+                                currRiskString = "Low"
+                                break;
+                            case 2:
+                                currRiskString = "Medium"
+                                break;
+                            case 3:
+                                currRiskString = "Critical"
+                                break;
+                            default:
+
+                        }
+                        this.setState({
+                            currRiskString: currRiskString
+                        })
+                        console.log(this.state.currRiskStatus)
                     }
                 }
                 this.setState({ message: response.status !== 200 ? body.message : '' });
@@ -234,7 +256,7 @@ class PatientDashboard extends Component {
                 alternateGridColor: null,
                 plotBands: [{ // Low
                     from: 0,
-                    to: 25,
+                    to: 1,
                     // color: 'rgb(229, 238, 176)',
                     color: 'rgb(234, 241, 195)',
                     label: {
@@ -244,8 +266,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // Medium
-                    from: 25,
-                    to: 50,
+                    from: 1,
+                    to: 2,
                     // color: 'rgb(255,250,205)',
                     color: 'rgb(248, 244, 210)',
                     label: {
@@ -255,8 +277,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // High Risk
-                    from: 50,
-                    to: 75,
+                    from: 2,
+                    to: 3,
                     // color: 'rgb(243, 220, 178)',
                     color: 'rgb(245, 227, 194)',
                     label: {
@@ -266,8 +288,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // Moderate breeze
-                    from: 75,
-                    to: 100,
+                    from: 3,
+                    to: 4,
                     color: 'rgb(246, 191, 191)',
                     label: {
                         text: 'Critical',
@@ -490,6 +512,7 @@ class PatientDashboard extends Component {
                             </Col>
                             <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
                             <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                            <Col><h1><Badge variant={this.state.currRiskStatus > 2 ? "warning" : "success"}>Risk Status<br></br><br></br>{this.state.currRiskString}<br></br><br></br><h6><a></a></h6></Badge></h1></Col>
                         </Row>
                     </Row>
                     <Row>

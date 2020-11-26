@@ -110,9 +110,9 @@ class ActivePatientDetails extends Component {
                     }
                 }
 
-                const { id, emailId, userGroup } = JSON.parse(window.atob(authToken.split('.')[1]));
 
-                const responseDash = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
+
+                const responseDash = await fetch(`/api/v1/patient/dashboard?emailId=${this.state.emailID}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',

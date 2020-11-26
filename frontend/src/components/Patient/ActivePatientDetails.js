@@ -189,7 +189,7 @@ class ActivePatientDetails extends Component {
                 alternateGridColor: null,
                 plotBands: [{ // Low
                     from: 0,
-                    to: 25,
+                    to: 1,
                     // color: 'rgb(229, 238, 176)',
                     color: 'rgb(234, 241, 195)',
                     label: {
@@ -199,8 +199,8 @@ class ActivePatientDetails extends Component {
                         }
                     }
                 }, { // Medium
-                    from: 25,
-                    to: 50,
+                    from: 1,
+                    to: 2,
                     // color: 'rgb(255,250,205)',
                     color: 'rgb(248, 244, 210)',
                     label: {
@@ -210,8 +210,8 @@ class ActivePatientDetails extends Component {
                         }
                     }
                 }, { // High Risk
-                    from: 50,
-                    to: 75,
+                    from: 2,
+                    to: 3,
                     // color: 'rgb(243, 220, 178)',
                     color: 'rgb(245, 227, 194)',
                     label: {
@@ -221,8 +221,8 @@ class ActivePatientDetails extends Component {
                         }
                     }
                 }, { // Moderate breeze
-                    from: 75,
-                    to: 100,
+                    from: 3,
+                    to: 4,
                     color: 'rgb(246, 191, 191)',
                     label: {
                         text: 'Critical',

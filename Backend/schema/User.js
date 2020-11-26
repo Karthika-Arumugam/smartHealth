@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { JWT_KEY} = require('../config.js');
+const { JWT_KEY } = require('../config.js');
 
 const userSchema = mongoose.Schema({
   emailId: {
@@ -26,77 +26,77 @@ const userSchema = mongoose.Schema({
     required: true,
   },
 
-  address : {
-    type : String,
+  address: {
+    type: String,
     required: true
 
   },
 
-  state : {
-    type : String,
+  state: {
+    type: String,
     required: true
   },
 
-  city : {
-    type : String,
+  city: {
+    type: String,
     required: true
   },
 
-  zip : {
-    type : String,
+  zip: {
+    type: String,
     required: true
   },
 
-  phone : {
-    type : String,
+  phone: {
+    type: String,
     required: true
 
   },
 
-  firstName : {
-    type : String,
+  firstName: {
+    type: String,
     required: true
   },
-  lastName : {
-    type : String,
+  lastName: {
+    type: String,
     required: true
   },
 
-  healthCareProvider : {
-    type : String,
-    required: function() {
+  healthCareProvider: {
+    type: String,
+    required: function () {
       return this.userGroup === "Healthcare" ? true : false
-    } 
+    }
   },
 
-  emergencyContact : {
-    type : String,
-    required: function() {
+  emergencyContact: {
+    type: String,
+    required: function () {
       return this.userGroup === "Patient" ? true : false
-    } 
+    }
   },
 
-  age : {
-    type : Number,
-    required: function() {
+  age: {
+    type: Number,
+    required: function () {
       return this.userGroup === "Patient" ? true : false
-    } 
+    }
 
   },
 
-  gender : {
-    type : String,
-    required : false
+  gender: {
+    type: String,
+    required: false
   },
 
-  smokingyears : {
-    type : Number,
-    required : false
+  smokingyears: {
+    type: Number,
+    required: false
   },
 
-  cigperday : {
-    type : Number,
-    required : false
+  cigperday: {
+    type: Number,
+    required: false
   }
 
 
@@ -122,7 +122,7 @@ userSchema.methods.generateAuthToken = async function () {
 
 userSchema.statics.findByCredentials = async (emailId, password) => {
   // Search for a user by email and password.
-  const user = await User.findOne({ emailId});
+  const user = await User.findOne({ emailId });
   if (!user) {
     throw new Error({ error: "Invalid login credentials" });
   }
@@ -133,10 +133,10 @@ userSchema.statics.findByCredentials = async (emailId, password) => {
   return user;
 };
 
-userSchema.statics.getProfile = async (req) => {
+userSchema.statics.getProfile = async (emailId) => {
   // Search for a user by email and password.
-  
-  const user = await User.findOne({  'emailId' : req.query.emailId });
+
+  const user = await User.findOne({ 'emailId': emailId });
   if (!user) {
     throw new Error({ error: "Invalid Details" });
   }
@@ -147,7 +147,7 @@ userSchema.statics.getProfile = async (req) => {
 
 userSchema.statics.getDeviceName = async (emailId) => {
   // Search for a user by email and password.
-  const device = await User.findOne({ emailId }, {deviceName : 1});
+  const device = await User.findOne({ emailId }, { deviceName: 1 });
   if (!device) {
     throw new Error({ error: "Invalid Details" });
   }
@@ -159,18 +159,18 @@ userSchema.statics.updateProfile = async (req) => {
 
   let email = req.emailId;
 
-  const result =  await User.findOne({'emailId' : email });
+  const result = await User.findOne({ 'emailId': email });
 
-  if(!result)
+  if (!result)
     return result;
 
   result.set(req);
   const user = await result.save();
 
-  if(!user)
+  if (!user)
     throw new Error({ message: "unable to update profile" });
-  
-    return user;
+
+  return user;
 
 };
 
@@ -178,9 +178,9 @@ userSchema.statics.userDetails = async (req) => {
 
   let email = req.emailId;
 
-  const result =  await User.findOne({'emailId' : email },{emailId : 1, age : 1, gender : 1, smokingyears: 1, cigperday:1});
+  const result = await User.findOne({ 'emailId': email }, { emailId: 1, age: 1, gender: 1, smokingyears: 1, cigperday: 1 });
 
-    return result;
+  return result;
 
 };
 
@@ -190,12 +190,12 @@ userSchema.statics.healthcareInfo = async (req) => {
 
   console.log("inside")
 
-  const result =  await User.distinct('healthCareProvider');
+  const result = await User.distinct('healthCareProvider');
 
   console.log(result)
 
-  if(!result)
-   throw new Error({ message: "unable to get healthcare details" });
+  if (!result)
+    throw new Error({ message: "unable to get healthcare details" });
 
   return result;
 

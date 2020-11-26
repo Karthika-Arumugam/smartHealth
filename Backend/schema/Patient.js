@@ -86,15 +86,9 @@ const patientSchema = mongoose.Schema({
 
   medications : [
     {
-      name :  {
       type : String,
       required: false
-      },
-
-      instructions : {
-        type : String,
-        required: false
-      }
+  
     }
   ],
 
@@ -129,15 +123,9 @@ const patientSchema = mongoose.Schema({
 
   allocatedSpecialists : [
     {
-      name : {
-        type : String,
-        required: false
-      },
-
-      emergencyContact : {
-        type : String,
-        required: false
-      }
+      type : String,
+      required: false
+  
     }
   ],
 

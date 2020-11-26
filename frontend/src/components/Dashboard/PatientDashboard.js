@@ -38,7 +38,7 @@ class PatientDashboard extends Component {
             if (this.state.authToken) {
                 const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
 
-                const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
+                const response = await fetch(`/api/v1/patient/dashboard`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -50,8 +50,10 @@ class PatientDashboard extends Component {
                 const body = await response.json();
                 if (response.status === 200) {
                     if (body) {
+                        console.log(body);
                         for (let index in body.time) {
-                            heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            // heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
                             riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
                             body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
                         }

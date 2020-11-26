@@ -27,7 +27,7 @@ router.post('/signup', async (req, res) => {
         currRiskStatus: 0,
         smokingyears: req.body.smokingyears,
         cigperday: req.body.cigperday,
-        healthcareProvider: req.body.healthcareProvider,
+        healthcareProvider: req.body.healthCareProvider,
         time: new Date()
       });
 
@@ -108,7 +108,7 @@ router.get('/profile', async (req, res) => {
   let prof, result;
   try {
     //const user = jwt.verify(req.cookies.cookie, JWT_KEY);
-    prof = await User.getProfile(req);
+    prof = await User.getProfile(req.query.emailId);
     result = JSON.parse(JSON.stringify(prof));
     res.json(result);
 

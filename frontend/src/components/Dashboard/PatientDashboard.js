@@ -67,8 +67,30 @@ class PatientDashboard extends Component {
                                 High: (highRiskCount / total) * 100,
                                 Low: (lowRiskcount / total) * 100
                             },
-                            deviceStatus: body.deviceStatus
+                            deviceStatus: body.deviceStatus,
+                            currRiskStatus: Number(body.currRiskStatus)
                         })
+                        let currRiskString = "";
+                        switch (Number(body.currRiskStatus)) {
+                            case 0:
+                                currRiskString = "Healthy"
+                                break;
+                            case 1:
+                                currRiskString = "Low"
+                                break;
+                            case 2:
+                                currRiskString = "Medium"
+                                break;
+                            case 3:
+                                currRiskString = "Critical"
+                                break;
+                            default:
+
+                        }
+                        this.setState({
+                            currRiskString: currRiskString
+                        })
+                        console.log(this.state.currRiskStatus)
                     }
                 }
                 this.setState({ message: response.status !== 200 ? body.message : '' });
@@ -490,6 +512,7 @@ class PatientDashboard extends Component {
                             </Col>
                             <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
                             <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                            <Col><h1><Badge variant={this.state.currRiskStatus > 2 ? "warning" : "success"}>Risk Status<br></br><br></br>{this.state.currRiskString}<br></br><br></br><h6><a></a></h6></Badge></h1></Col>
                         </Row>
                     </Row>
                     <Row>

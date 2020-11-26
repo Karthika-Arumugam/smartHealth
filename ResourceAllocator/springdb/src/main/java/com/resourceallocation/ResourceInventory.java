@@ -58,9 +58,9 @@ public class ResourceInventory {
 
         HttpEntity requestEntity = new HttpEntity(healthcare, requestHeaders);
         ResponseEntity response = restTemplate.exchange(gethealthcare, HttpMethod.GET, requestEntity, String.class);
-        System.out.println(" healthcare data received" + response.getBody().toString());
+        System.out.println(" healthcare data received" + response.getBody().toString().replaceAll("\"",""));
 
-        return response.getBody().toString();
+        return response.getBody().toString().replaceAll("\"","");
     }
 
     public void allocateresource(String patientId, String resource, Request request) {

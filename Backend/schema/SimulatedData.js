@@ -212,17 +212,17 @@ const simulatedDataSchema = mongoose.Schema({
     required: false
   },
 
-  restecg_0 : {
+  'restecg_0.0' : {
     type: Number,
    required: false
   },
 
-  restecg_1 : {
+  'restecg_1.0' : {
     type: Number,
     required: false
   },
 
-  restecg_2 : {
+  'restecg_2.0' : {
     type: Number,
     required: false
   },

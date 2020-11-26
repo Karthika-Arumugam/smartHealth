@@ -5,14 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ResourceAllocator {
 
-    private Map<String,Request> patientRequestMap = new HashMap<>();
+    private Map<String,Request> patientRequestMap = new ConcurrentHashMap<>();
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
-    private Map<String,List<String>> patientResourceMap = new HashMap<>();
+    private Map<String,List<String>> patientResourceMap = new ConcurrentHashMap<>();
 
     private PriorityQueue<Map.Entry<String,Double>> priorityQueue = new PriorityQueue<>(new Comparator<Map.Entry<String, Double>>() {
         @Override
@@ -44,7 +45,7 @@ public class ResourceAllocator {
 
             while (true) {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(30000);
                     LOG.info("Inner Thread for resource allocation");
 
                     if (!priorityQueue.isEmpty()) {
@@ -95,7 +96,7 @@ public class ResourceAllocator {
 
             while (true) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(60000);
                     LOG.info("Inner Thread for wait queue resource allocation");
 
                     for(Map.Entry<String,List<String>> waitRequest : waitQueue) {
@@ -104,7 +105,7 @@ public class ResourceAllocator {
 
                         for (String resource : waitRequest.getValue()) {
 
-
+                            LOG.info("waiting for" + resource);
                             if (resourceInventory.isResourceAvailable(waitRequest.getKey(), resource,patientRequestMap.get(waitRequest.getKey()))) {
                                 resourceInventory.allocateresource(waitRequest.getKey(), resource, patientRequestMap.get(waitRequest.getKey()));
                                 resourceInventory.updateResourceAllocationStatus(patientRequestMap.get(waitRequest.getKey()),"allocated",resource);

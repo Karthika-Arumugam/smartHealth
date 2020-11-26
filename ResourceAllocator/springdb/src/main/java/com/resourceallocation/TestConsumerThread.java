@@ -33,6 +33,7 @@ public class TestConsumerThread implements Runnable {
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
+                System.out.println("Polling");
                 final ConsumerRecords<Long, String> consumerRecords = consumer.poll(1000);
                 for(ConsumerRecord<Long, String> cr : consumerRecords) {
                     System.out.println("Received consumer request");

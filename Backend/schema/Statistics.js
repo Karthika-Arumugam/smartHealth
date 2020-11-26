@@ -6,8 +6,7 @@ const statisticsSchema = mongoose.Schema({
 
   requestId: {
     type: Number,
-    required: true,
-    unique: true
+    required: true
   },
 
   patientId : {

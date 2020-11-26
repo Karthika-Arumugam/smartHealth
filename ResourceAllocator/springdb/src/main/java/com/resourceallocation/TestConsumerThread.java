@@ -24,7 +24,7 @@ public class TestConsumerThread implements Runnable {
 
     public void run (){
         final Consumer<Long, String> consumer = createConsumer();
-        System.out.println("Polling");
+        ResourceRequestConsumer resourceRequestConsumer = new ResourceRequestConsumer();
 
         try {
             while (true) {
@@ -39,7 +39,6 @@ public class TestConsumerThread implements Runnable {
                     System.out.println("Received consumer request");
                     System.out.println(cr);
                     System.out.printf("Consumer Record:(%d, %s, %d, %d)\n", cr.key(), cr.value(), cr.partition(), cr.offset());
-                    ResourceRequestConsumer resourceRequestConsumer = new ResourceRequestConsumer();
                     resourceRequestConsumer.consume(cr.value());
                 }
                 consumer.commitAsync();

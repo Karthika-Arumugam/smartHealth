@@ -73,7 +73,7 @@ public class ResourceInventory {
 
         JSONObject allocationRequest = new JSONObject();
         allocationRequest.put("requestId", request.getId());
-        allocationRequest.put("patient", request.getPatientId());
+        allocationRequest.put("emailId", request.getPatientId());
         allocationRequest.put("healthRisk", request.getHealthRisk());
         allocationRequest.put("healthcareProvider", request.getHealthCareProvider());
         allocationRequest.put("resourceType",resource);

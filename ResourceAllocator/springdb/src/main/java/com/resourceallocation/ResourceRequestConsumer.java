@@ -25,7 +25,7 @@ public class ResourceRequestConsumer {
         dbupdates.add(requestData);
 
       //  String  criticality  =  getCriticality(requestData) ;
-        String  criticality  =  "high" ;
+        String  criticality  =  "low" ;
         String timestamp = new Date().toString() ;
         String patientId = getPatientId(requestData);
 

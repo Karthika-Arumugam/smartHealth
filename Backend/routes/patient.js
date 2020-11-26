@@ -38,7 +38,7 @@ router.get('/dashboard', async (req, res) => {
 
 
     let result = JSON.parse(JSON.stringify(patient));
-    result = { ...result, heartRates: heartRates, riskStatus : riskStatus, deviceName: deviceName };
+    result = { ...result, heartRates: heartRates, riskStatus: riskStatus, deviceName: deviceName };
     res.json(result);
 
   } catch (error) {
@@ -95,8 +95,12 @@ router.post("/activateDevice", async (req, res) => {
       }
 
       // generate payload with patient static info, start simulator on edge
-      const smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-      const payload = `{\"PatientID\": \"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\": ${isMale},\"years\" : ${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"True" }`
+      let smokeYears;
+      if (patientDetails.smokingyears)
+        smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+      else
+        smokeYears = 0;
+      const payload = `{\"PatientID\":\"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\":${isMale},\"years\":${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"True" }`
       await send(payload);
       res.json({ "deviceStatus": true });
     }
@@ -138,8 +142,14 @@ router.post("/deactivateDevice", async (req, res) => {
       }
 
       // generate payload with patient static info, start simulator on edge
-      const smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-      const payload = `{\"PatientID\": \"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\": ${isMale},\"years\" : ${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"False" }`
+      let smokeYears;
+      if (patientDetails.smokingyears) {
+        smokeYears = patientDetails.smokingyears.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+      }
+      else {
+        smokeYears = 0;
+      }
+      const payload = `{\"PatientID\":\"${patientDetails.emailId}\",\"Age\":${patientDetails.age},\"Sex\":${isMale},\"years\":${smokeYears},\"Smoke\":\"${isSmoker}\",\"Enable\":"False" }`
       await send(payload);
       res.json({ "deviceStatus": false });
     }
@@ -193,17 +203,17 @@ router.get("/morePatientInfoAboutActive", async (req, res) => {
   try {
     const result = await Patient.activatedDevices(req);
     let ans = [];
- 
-    for(let user in result) {
-   
+
+    for (let user in result) {
+
       let patient = await User.userDetails(result[user]);
-       ans.push(patient);
+      ans.push(patient);
     }
 
 
     if (!ans)
       return res.status(400).json({ message: "Invalid details" });
-     console.log(ans);
+    console.log(ans);
     res.json(ans);
   } catch (error) {
     res.status(400).send({ message: "Server error! Unable to get patient info" });

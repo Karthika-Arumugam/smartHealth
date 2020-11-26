@@ -19,10 +19,10 @@ router.get('/dashboard', async (req, res) => {
   }
 
   try {
-    const user = jwt.verify(req.cookies.cookie, JWT_KEY);
+    // const user = jwt.verify(req.cookies.cookie, JWT_KEY);
 
-    let patient = await Patient.getDashboard(user.emailId);
-    let heartRatesData = await SimulatedData.getHeartrate(user.emailId);
+    let patient = await Patient.getDashboard(req.query.emailId);
+    let heartRatesData = await SimulatedData.getHeartrate(req.query.emailId);
     let deviceName = "Simulator"
 
     let heartRates = [];

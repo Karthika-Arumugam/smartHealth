@@ -38,7 +38,7 @@ class PatientDashboard extends Component {
             if (this.state.authToken) {
                 const { id, emailId, userGroup } = JSON.parse(window.atob(this.state.authToken.split('.')[1]));
 
-                const response = await fetch(`/api/v1/patient/dashboard`, {
+                const response = await fetch(`/api/v1/patient/dashboard?emailId=${emailId}`, {
                     method: 'get',
                     mode: "cors",
                     redirect: 'follow',
@@ -52,10 +52,10 @@ class PatientDashboard extends Component {
                     if (body) {
                         console.log(body);
                         for (let index in body.time) {
-                            // heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
-                            heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
+                            heartRateData.push([new Date(body.time[index]).getTime(), body.heartRates[index]]);
+                            // heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || 0]);
                             riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
-                            body.riskStatus[index] > 50 ? highRiskCount++ : lowRiskcount++;
+                            body.riskStatus[index] > 2 ? highRiskCount++ : lowRiskcount++;
                         }
                         const total = highRiskCount + lowRiskcount;
                         this.setState({
@@ -234,7 +234,7 @@ class PatientDashboard extends Component {
                 alternateGridColor: null,
                 plotBands: [{ // Low
                     from: 0,
-                    to: 25,
+                    to: 1,
                     // color: 'rgb(229, 238, 176)',
                     color: 'rgb(234, 241, 195)',
                     label: {
@@ -244,8 +244,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // Medium
-                    from: 25,
-                    to: 50,
+                    from: 1,
+                    to: 2,
                     // color: 'rgb(255,250,205)',
                     color: 'rgb(248, 244, 210)',
                     label: {
@@ -255,8 +255,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // High Risk
-                    from: 50,
-                    to: 75,
+                    from: 2,
+                    to: 3,
                     // color: 'rgb(243, 220, 178)',
                     color: 'rgb(245, 227, 194)',
                     label: {
@@ -266,8 +266,8 @@ class PatientDashboard extends Component {
                         }
                     }
                 }, { // Moderate breeze
-                    from: 75,
-                    to: 100,
+                    from: 3,
+                    to: 4,
                     color: 'rgb(246, 191, 191)',
                     label: {
                         text: 'Critical',

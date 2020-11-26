@@ -218,7 +218,7 @@ class PatientProfile extends Component {
                             <Form.Label column md="2" >Gender</Form.Label>
                             <Col md={4}><Form.Control name="gender" value={this.state.gender} as="select">
                                 <option>Male</option>
-                                <option selected>Female</option>
+                                <option>Female</option>
                                 <option>Other</option>
                             </Form.Control></Col>
                             <Form.Label column md="2">Age</Form.Label>

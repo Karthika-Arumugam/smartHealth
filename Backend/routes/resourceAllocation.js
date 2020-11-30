@@ -1,6 +1,7 @@
 const express = require("express");
 const ResourceAllocation = require("../schema/ResourceAllocation");
 const Resource = require("../schema/Resource");
+const Patient = require("../schema/Patient");
 const router = express.Router();
 
 router.post('/add', async (req, res) => {
@@ -23,8 +24,48 @@ router.post('/add', async (req, res) => {
 router.post('/allocate', async (req, res) => {
       // update resource
       let resource;
+      if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
+
       try {
        resource= await Resource.decrement(req.body);
+
+       let patient;
+
+       console.log(req.body.emailId)
+       console.log(req.body.resourceType)
+
+      //  if(req.body.resourceType === "Medical Prescription") {
+
+      //  patient = await Patient.getDashboard(req.body.emailId);
+      //  var set = {
+      //   emailId : req.body.emailId,
+      //   medications : [...medications,req.body.resourceType]
+      //   }
+       
+      //  patient.set(set);
+      //  await patient.save();
+
+      //  console.log("medications updated")
+
+      //  }
+
+      //  if(req.body.resourceType === "Cardiologist") {
+
+      //   patient = await Patient.getDashboard(req.body.emailId);
+      //   var set = {
+      //    emailId : req.body.emailId,
+      //    allocatedSpecialists : [...allocatedSpecialists,req.body.resourceType]
+      //    }
+        
+      //   patient.set(set);
+      //   await patient.save();
+ 
+      //   console.log("Allocated Specialists updated")
+         
+      // }
+
       //  resource= await ResourceAllocation.update(req);
       res.json({ message: " resource request updated successfully"});
     

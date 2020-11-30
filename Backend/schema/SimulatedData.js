@@ -252,49 +252,6 @@ const simulatedDataSchema = mongoose.Schema({
    required: false
   }
 
-  // int Painloc;
-	// int Painexer;
-	// int htn;
-	// int Famhist; 
-	// int Dig;
-	// int prop; 
-	// int nitr; 
-	// int Pro;
-	// int Diuretic; 
-	
-	// int Chol;
-	// int Fbs;
-	// int Thalach;
-	// int Thalrest; 
-	// int Tpeakbps ;
-	// int Tpeakbpd;
-	// int Trestbpd ;
-	// int Thaldur; 
-	// int Met;
-	// int exang;
-	// int Xhypo; 
-	// int Old_peak;
-	// int Slope; 
-	// int Rldv5;
-	// int Rldv5e; 
-	// int Cp_encoded;
-	// int Restcg_encoded;
-  // int cp_1;
-	// int cp_2;
-	// int cp_3;
-	// int cp_4;
-	// int relrest;
-	// int restecg_0;
-	// int restecg_1;
-  // int restecg_2;
-  // int Age;
-	// int Sex;
-	
-	
-	// String PatientId;
-	
-	// /* G Values */
-	// int Trestbps;
 
 });
 
@@ -308,6 +265,17 @@ simulatedDataSchema.pre("save", async function (next) {
 simulatedDataSchema.statics.getHeartrate = async (emailId) => {
   // get heartbeat data details  by email 
   const data = await  SimulatedData.find({ emailId },{  risk_factor : 1,  trestbps : 1}).sort({ time : -1}).limit(20);
+  
+  if (!data) {
+    throw new Error({ error: "Invalid Details" });
+  }
+ return data;
+};
+
+
+simulatedDataSchema.statics.delete = async (req) => {
+  // get heartbeat data details  by email 
+  const data = await  SimulatedData.deleteMany({ trestbps : 0});
   
   if (!data) {
     throw new Error({ error: "Invalid Details" });

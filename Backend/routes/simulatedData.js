@@ -25,5 +25,20 @@ router.post('/add', async (req, res) => {
   }
 });
 
+router.post('/delete', async (req, res) => {
+
+
+  // Create a new data
+  try {
+    const data = await SimulatedData.delete(req);
+
+    res.status(201).send({ message : "Simulated Data deleted successfully" });
+  } catch (error) {
+    console.log("error")
+    res.status(400).send({ message:error.message});
+  }
+});
+
+
 
 module.exports = router;

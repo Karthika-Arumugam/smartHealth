@@ -70,7 +70,7 @@ public class TestConsumerThread implements Runnable {
            // properties.load(getClass().getResourceAsStream("consumer.properties"));
 //           /Users/deepika/Documents/GitHub/CMPE226_DatabaseForum/backend/springdb/src/main/java/com/resourceallocation/TestConsumerThread.java
         //   properties.load(new FileReader("/Users/deepika/Documents/GitHub/CMPE226_DatabaseForum/backend/springdb/src/main/resources/consumer.config"));
-            properties.load(new FileReader("/home/azureuser/smartHealth/ResourceAllocator/springdb/consumer.config"));
+            properties.load(new FileReader("/home/azureuser/smartHealth/ResourceAllocator/consumer.config"));
             // Create the consumer using properties.
             final Consumer<Long, String> consumer = new KafkaConsumer<>(properties);
 

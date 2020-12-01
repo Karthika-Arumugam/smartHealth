@@ -14,7 +14,11 @@ public class ResourceRequestConsumer {
 
     private Queue<String> dbupdates = new PriorityQueue<>();
 
-    public ResourceRequestConsumer() {
+    private ResourceInventory resourceInventory = new ResourceInventory();
+    private ResourceAllocator resourceAllocator = new ResourceAllocator();
+
+    public ResourceRequestConsumer()
+    {
         new DBUpdater().start();
     }
 
@@ -24,37 +28,58 @@ public class ResourceRequestConsumer {
         LOG.info("Allocate resources.");
         dbupdates.add(requestData);
 
-      //  String  criticality  =  getCriticality(requestData) ;
-        String  criticality  =  "low" ;
+        String  criticality  =  getCriticality(requestData) ;
+      //  String  criticality  =  "normal" ;
         String timestamp = new Date().toString() ;
         String patientId = getPatientId(requestData);
 
         System.out.println("Request received for" + patientId);
-
-        ResourceInventory resourceInventory = new ResourceInventory();
 
         RiskCalculator riskCalculator = new RiskCalculator();
         double riskFactor = riskCalculator.assessRiskAndPriority(criticality,timestamp,patientId);
 
         System.out.println("risk evaluation  completed" + riskFactor);
 
-        if(riskFactor > 0) {
+        int prevRiskLevel = resourceInventory.getRiskStatus(patientId);
 
-            Request request = new Request(patientId,"queued");
-            request.setReceivedAt(new Date());
-            request.setHealthCareProvider(resourceInventory.getHealthcare(patientId));
-            request.setHealthRisk(criticality);
+        if(riskFactor == 0 || prevRiskLevel != Math.ceil(riskFactor)){
 
-            resourceInventory.addRequestStatistics(request);
+            resourceInventory.deallocateAllResources(patientId,resourceInventory.getHealthcare(patientId));
+            resourceAllocator.deleteAllRequests(patientId);
+        }
+
+       if(riskFactor >  0 ) {
+
             ResourceEstimator resourceEstimator = new ResourceEstimator();
             List<String> resourcesNeeded = resourceEstimator.estimateResources(criticality,patientId);
+           System.out.println("resource estimation done" + resourcesNeeded);
 
-            System.out.println("resource estimation done" + resourcesNeeded);
+           System.out.println("resources needed 1 :" + resourcesNeeded);
+
+            if(resourceAllocator.patientResourceMap.get(patientId) !=null) {
+
+                System.out.println("patient resource map has elements"+resourceAllocator.patientResourceMap.get(patientId) );
+
+                resourcesNeeded.removeAll(resourceAllocator.patientResourceMap.get(patientId));
+            }
+
+           System.out.println("resources needed 2 :" + resourcesNeeded);
+
+            resourceInventory.removeAllocatedResources(resourcesNeeded,patientId,resourceInventory.getHealthcare(patientId));
+
+           System.out.println("resources needed 3 :" + resourcesNeeded);
+           if(resourcesNeeded.isEmpty())
+               return;
+
+           Request request = new Request(patientId,"queued");
+           request.setReceivedAt(new Date());
+           request.setHealthCareProvider(resourceInventory.getHealthcare(patientId));
+           request.setHealthRisk(criticality);
+           resourceInventory.addRequestStatistics(request);
 
             for(String  resource : resourcesNeeded)
                resourceInventory.createResourceAllocationStatus(request,"received",resource);
 
-            ResourceAllocator resourceAllocator = new ResourceAllocator();
             resourceAllocator.allocateResources(riskFactor,resourcesNeeded,patientId,request);
         }
     }
@@ -128,14 +153,14 @@ public class ResourceRequestConsumer {
                         for(int i = 0 ; i < dataMap.length ; i++) {
                             String key = dataMap[i].split(":")[0].trim();
 
-                            System.out.println(dataMap[i].split(":")[0].trim());
+                           // System.out.println(dataMap[i].split(":")[0].trim());
 
                             if(key.equals("emailId") || key.equals("chestPainType") || key.equals("risk_level") || key.equals("deviceId")   ) {
-                                System.out.println(dataMap[i].split(":")[1].trim());
+                             //   System.out.println(dataMap[i].split(":")[1].trim());
                                 simulatedData.put(dataMap[i].split(":")[0].trim(), dataMap[i].split(":")[1].trim());
                             }
                             else {
-                                System.out.println(dataMap[i].split(":")[1].trim());
+                               // System.out.println(dataMap[i].split(":")[1].trim());
                                 float input2 = Float.parseFloat(dataMap[i].split(":")[1].trim());
                                 int input1 = (int) input2;
                                 simulatedData.put(dataMap[i].split(":")[0].trim(), input1);

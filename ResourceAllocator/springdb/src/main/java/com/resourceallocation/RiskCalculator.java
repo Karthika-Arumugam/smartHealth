@@ -14,14 +14,14 @@ public class RiskCalculator {
 
         int risk = 0;
 
-        switch (criticality) {
+        switch (criticality.toLowerCase()) {
             case "low":
                 risk = 1;
                 break;
             case "medium":
                 risk = 2;
                 break;
-            case "high":
+            case "critical":
                 risk = 3;
                 break;
         }

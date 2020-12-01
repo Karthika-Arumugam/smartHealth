@@ -33,6 +33,7 @@ public class TestConsumerThread implements Runnable {
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
+
                 System.out.println("Polling");
                 final ConsumerRecords<Long, String> consumerRecords = consumer.poll(1000);
                 for(ConsumerRecord<Long, String> cr : consumerRecords) {
@@ -42,11 +43,13 @@ public class TestConsumerThread implements Runnable {
                     resourceRequestConsumer.consume(cr.value());
                 }
                 consumer.commitAsync();
+               // Thread.sleep(30000);
+
 
                // ResourceRequestConsumer resourceRequestConsumer = new ResourceRequestConsumer();
              //   resourceRequestConsumer.consume("\"{\\\"deviceId\\\": \\\"DownStreamSimulator\\\", \\\"messageId\\\": 4, \\\"emailId\\\": \\\"user@gmail.com\\\", \\\"age\\\": 50, \\\"chol\\\": 343, \\\"cigs\\\": 10.0, \\\"cp_1\\\": 0, \\\"cp_2\\\": 0, \\\"cp_3\\\": 0, \\\"cp_4\\\": 1, \\\"dig\\\": 0, \\\"diuretic\\\": 0, \\\"exang\\\": 1, \\\"famhist\\\": -9, \\\"fbs\\\": 1, \\\"htn\\\": 1, \\\"met\\\": 5, \\\"nitr\\\": 0, \\\"old_peak\\\": 1, \\\"painexer\\\": 1, \\\"painloc\\\": 1, \\\"pro\\\": 0, \\\"prop\\\": 0, \\\"relrest\\\": 1, \\\"restecg_0\\\": 1, \\\"restecg_1\\\": 0, \\\"restecg_2\\\": 0, \\\"rldv5\\\": 4, \\\"rldv5e\\\": 3, \\\"sex\\\": 1, \\\"slope\\\": 2, \\\"thalach\\\": 102, \\\"thaldur\\\": 18, \\\"thalrest\\\": 57, \\\"tpeakbpd\\\": 131, \\\"tpeakbps\\\": 188, \\\"trestbpd\\\": 53, \\\"trestbps\\\": 167, \\\"xhypo\\\": 0, \\\"years\\\": 20.0, \\\"risk_level\\\": \\\"Low\\\", \\\"risk_factor\\\": 1}\"");
             }
-        } catch (CommitFailedException e) {
+        } catch (Exception e) {
             System.out.println("CommitFailedException: " + e);
         } finally {
             consumer.close();
@@ -66,8 +69,8 @@ public class TestConsumerThread implements Runnable {
             //Get remaining properties from config file
            // properties.load(getClass().getResourceAsStream("consumer.properties"));
 //           /Users/deepika/Documents/GitHub/CMPE226_DatabaseForum/backend/springdb/src/main/java/com/resourceallocation/TestConsumerThread.java
-           properties.load(new FileReader("/home/azureuser/smartHealth/ResourceAllocator/springdb/consumer.config"));
-
+        //   properties.load(new FileReader("/Users/deepika/Documents/GitHub/CMPE226_DatabaseForum/backend/springdb/src/main/resources/consumer.config"));
+            properties.load(new FileReader("/home/azureuser/smartHealth/ResourceAllocator/springdb/consumer.config"));
             // Create the consumer using properties.
             final Consumer<Long, String> consumer = new KafkaConsumer<>(properties);
 

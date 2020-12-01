@@ -8,7 +8,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ResourceInventory {
 
@@ -204,5 +207,72 @@ public class ResourceInventory {
 
     public void setCookie(String cookie) {
         this.cookie = cookie;
+    }
+
+    public void deallocateAllResources(String patientId, String healthcare) {
+
+        //get all allocated resources
+        //deallocate each
+
+
+        final String resourcedeAllocation = "http://localhost:3001/api/v1/resourceAllocation/deallocateAll";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", getCookie());
+
+        JSONObject deallocationRequest = new JSONObject();
+        deallocationRequest.put("patient",patientId );
+        deallocationRequest.put("healthcareProvider", healthcare);
+
+        HttpEntity requestEntity = new HttpEntity(deallocationRequest, requestHeaders);
+        ResponseEntity response = restTemplate.exchange(resourcedeAllocation, HttpMethod.POST, requestEntity, String.class);
+
+        System.out.println("resources deallocated  for patient : " + patientId);
+
+    }
+
+    public int getRiskStatus(String patientId) {
+
+        System.out.println(" Fetching previous risk status data for patient :  " + patientId);
+
+        final String getRiskstatus = "http://localhost:3001/api/v1/patient/getRiskStatus?emailId="+patientId;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", getCookie());
+
+        JSONObject riskstatus = new JSONObject();
+
+        HttpEntity requestEntity = new HttpEntity(riskstatus, requestHeaders);
+        ResponseEntity response = restTemplate.exchange(getRiskstatus, HttpMethod.GET, requestEntity, String.class);
+        System.out.println(" previous risk status data received" + response.getBody().toString().replaceAll("\"",""));
+
+        return Integer.parseInt(response.getBody().toString().replaceAll("\"",""));
+    }
+
+    public void removeAllocatedResources(List<String> resourcesNeeded, String patientId, String healthcare) {
+
+        System.out.println(" Checking allocated resources for  patient:  " + patientId);
+
+        final String getAllocations = "http://localhost:3001/api/v1/resourceAllocation/getAllocations";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", getCookie());
+
+        JSONObject allocationRequest = new JSONObject();
+        allocationRequest.put("patient",patientId );
+        allocationRequest.put("healthcareProvider", healthcare);
+
+        HttpEntity requestEntity = new HttpEntity(allocationRequest, requestHeaders);
+       // ResponseEntity response = restTemplate.exchange(getAllocations, HttpMethod.POST, requestEntity, ArrayList.class);
+
+        ResponseEntity<String[]> responseEntity = restTemplate.postForEntity(getAllocations,requestEntity, String[].class);
+        List<String> resources = Arrays.asList(responseEntity.getBody());
+
+        System.out.println("resources allocations  for patient : " + resources);
+
+      resourcesNeeded.removeAll(resources);
     }
 }

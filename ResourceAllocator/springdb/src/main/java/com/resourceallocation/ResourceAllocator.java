@@ -9,20 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ResourceAllocator {
 
-    private Map<String,Request> patientRequestMap = new ConcurrentHashMap<>();
+    public Map<String,Request> patientRequestMap = new ConcurrentHashMap<>();
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    public final Logger LOG = LoggerFactory.getLogger(getClass());
 
-    private Map<String,List<String>> patientResourceMap = new ConcurrentHashMap<>();
+    public Map<String,List<String>> patientResourceMap = new ConcurrentHashMap<>();
 
-    private PriorityQueue<Map.Entry<String,Double>> priorityQueue = new PriorityQueue<>(new Comparator<Map.Entry<String, Double>>() {
+    public PriorityQueue<Map.Entry<String,Double>> priorityQueue = new PriorityQueue<>(new Comparator<Map.Entry<String, Double>>() {
         @Override
         public int compare(Map.Entry<String, Double> a, Map.Entry<String, Double> b) {
             return a.getValue().equals(b.getValue()) ? b.getKey().compareTo(a.getKey()) : (int) (a.getValue()-b.getValue());
         }
     });
 
-    private List<Map.Entry<String,List<String>>> waitQueue = new ArrayList<>();
+    public List<Map.Entry<String,List<String>>> waitQueue = new ArrayList<>();
 
     public ResourceAllocator() {
         new PriorityBasedAllocator().start();
@@ -34,6 +34,39 @@ public class ResourceAllocator {
         patientResourceMap.put(patientId,resources);
         patientRequestMap.put(patientId,request);
         priorityQueue.add( new AbstractMap.SimpleEntry<>(patientId, riskFactor));
+
+    }
+
+    public void deleteAllRequests(String patientId) {
+
+
+
+      //  priorityQueue.add( new AbstractMap.SimpleEntry<>(patientId, riskFactor));
+
+        for(String patient : patientResourceMap.keySet()) {
+            if(patient.equals(patientId))
+                patientResourceMap.remove(patient);
+        }
+
+
+        ResourceInventory resourceInventory = new ResourceInventory();
+
+        for(String patient : patientRequestMap.keySet()) {
+
+            if(patient.equals(patientId)) {
+                System.out.println("deleting all requests for : "+patientId);
+
+                Request request = patientRequestMap.get(patientId);
+                request.setServedAt(new Date());
+                request.setStatus("completed");
+                resourceInventory.updateRequestStatistics(request);
+                patientRequestMap.remove(patient);
+            }
+
+        }
+
+        priorityQueue.remove(patientId);
+        waitQueue.remove(patientId);
 
     }
 

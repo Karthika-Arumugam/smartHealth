@@ -9,7 +9,7 @@ public class ResourceEstimator {
 
         List<String> resourcesNeeded = new ArrayList<>();
 
-        switch (criticality) {
+        switch (criticality.toLowerCase()) {
             case "low":
                 resourcesNeeded.add("Medical Prescription");
                 resourcesNeeded.add("Monitoring");
@@ -18,7 +18,7 @@ public class ResourceEstimator {
                 resourcesNeeded.add("Cardiologist");
                 resourcesNeeded.add("Equipment");
                 break;
-            case "high":
+            case "critical":
                 resourcesNeeded.add("Ambulance");
                 break;
         }

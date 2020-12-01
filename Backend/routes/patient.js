@@ -235,4 +235,20 @@ router.get('/getHealthcare', async (req, res) => {
     }
 });
 
+
+router.get('/getRiskStatus', async (req, res) => {
+  if (!(req.cookies.cookie)) {
+      return res.status(401).json({ message: "You are not logged in,please login to continue" });
+    }
+    // get riskstatus
+    let riskstatus;
+    try {
+      riskstatus  = await Patient.getRiskStatus(req);
+      res.json(JSON.parse(JSON.stringify(riskstatus)));
+
+    } catch (error) {
+      res.status(400).send({ message: "Error !Unable to fetch riskstatus"});
+    }
+});
+
 module.exports = router;

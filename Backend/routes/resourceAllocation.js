@@ -146,6 +146,64 @@ router.post('/deallocate', async (req, res) => {
   });
 
 
+  router.post('/deallocateAll', async (req, res) => {
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
+      // delete all resource allocations
+      let resources;
+      try {
+
+        resources = await ResourceAllocation.allocations(req.body);
+
+        console.log(resources)
+
+        resources.forEach(resource => {
+          console.log(resource)
+          ResourceAllocation.deallocate(resource);
+          Resource.increment(resource);
+        });
+
+
+        res.json({ message: "All resource allocations deleted successfully"});
+      } catch (error) {
+        return res.status(400).json({ message: "Unable to deallocate resource"});
+      }
+  });
+
+
+  router.post('/getAllocations', async (req, res) => {
+    if (!(req.cookies.cookie)) {
+        return res.status(401).json({ message: "You are not logged in,please login to continue" });
+      }
+      // get  all resource allocations
+      let resources;
+      try {
+
+        console.log(  req.body)
+
+        req.body = { ... req.body, status: 'allocated'};
+
+        resources = await ResourceAllocation.allocations(req.body);
+
+        console.log(resources)
+
+        let result = [];
+
+        resources.forEach(resource => {
+          result.push(resource.resourceType)
+        });
+
+        console.log(result)
+
+        res.json(result);
+    
+      } catch (error) {
+        return res.status(400).json({ message: "Unable to get allocations"});
+      }
+  });
+
+
 
 
 module.exports = router;

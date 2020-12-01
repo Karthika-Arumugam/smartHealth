@@ -69,6 +69,7 @@ resourceAllocationSchema.statics.deallocate = async (req) => {
       return result;
 
       var set = {
+        lastUpdatedAt : new Date(),
         status  : "deallocated"
     }
     
@@ -125,6 +126,20 @@ resourceAllocationSchema.statics.getAll = async (req) => {
     data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } ).limit(30)
   }
 
+  if (!data) {
+    throw new Error({ error: "Couldn't get resource allocation details" });
+  }
+  return data;
+};
+
+
+resourceAllocationSchema.statics.allocations = async (req) => {
+
+  console.log(req.healthcareProvider)
+
+  console.log(req.patient)
+
+  let data = await ResourceAllocation.find(req);
   if (!data) {
     throw new Error({ error: "Couldn't get resource allocation details" });
   }

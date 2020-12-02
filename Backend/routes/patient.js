@@ -38,7 +38,7 @@ router.get('/dashboard', async (req, res) => {
 
 
     let result = JSON.parse(JSON.stringify(patient));
-    result = { ...result, heartRates: heartRates, riskStatus: riskStatus, deviceName: deviceName };
+    result = { ...result, heartRates: heartRates.reverse(), riskStatus: riskStatus.reverse(), deviceName: deviceName };
     res.json(result);
 
   } catch (error) {

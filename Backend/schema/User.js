@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Patient = require("./Patient.js");
 const { JWT_KEY } = require('../config.js');
 
 const userSchema = mongoose.Schema({
@@ -159,6 +160,8 @@ userSchema.statics.updateProfile = async (req) => {
 
   let email = req.emailId;
 
+ 
+
   const result = await User.findOne({ 'emailId': email });
 
   if (!result)
@@ -166,6 +169,33 @@ userSchema.statics.updateProfile = async (req) => {
 
   result.set(req);
   const user = await result.save();
+
+  
+  if(result.userGroup === 'Patient') {
+
+    const patient = await Patient.findOne({ 'emailId': email });
+
+    if (!patient) {
+      return patient;
+    }
+
+    var set = {
+      'emailId': req.emailId,
+      'firstName': req.firstName,
+      'lastName': req.lastName,
+      'age': req.age,
+      'gender': req.gender,
+      'phone': req.phone,
+      'smokingyears':req.smokingyears,
+       'cigperday' : req.cigperday
+    }
+
+    patient.set(set);
+    const patient2 = await patient.save();
+
+    console.log("patient saved")
+  }
+
 
   if (!user)
     throw new Error({ message: "unable to update profile" });
@@ -200,7 +230,6 @@ userSchema.statics.healthcareInfo = async (req) => {
   return result;
 
 };
-
 
 
 const User = mongoose.model("User", userSchema, "User");

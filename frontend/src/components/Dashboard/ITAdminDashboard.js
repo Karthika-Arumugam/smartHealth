@@ -614,7 +614,7 @@ class ITAdminDashboard extends Component {
                 console.log(typeof (index));
                 if (index < 10) {
                     const datealloc = new Date(key.lastUpdatedAt)
-                    const dateString = datealloc.toLocaleDateString()
+                    let dateString = new Intl.DateTimeFormat(['ban', 'id']).format(datealloc)
                     xx.push(
                         <tr>
                             <td>{key.resourceType}</td>

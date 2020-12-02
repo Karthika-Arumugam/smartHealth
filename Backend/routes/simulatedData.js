@@ -18,7 +18,7 @@ router.post('/add', async (req, res) => {
     await Patient.updateRiskStatus(req.body.emailId, req.body.risk_factor);
 
 
-    res.status(201).send({ message : "Simulated Data saved successfully" });
+    res.status(201).send({ message : "Simulated Data saved successfully for " + req.body.emailId });
   } catch (error) {
     console.log("error")
     res.status(400).send({ message:error.message});

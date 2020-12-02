@@ -135,7 +135,9 @@ public class ResourceRequestConsumer {
                     if(!dbupdates.isEmpty()) {
 
                      //   "{\"deviceId\": \"DownStreamSimulator\", \"messageId\": 4, \"patientId\": \"user@gmail.com\", \"age\": 50, \"chol\": 343, \"cigs\": 10.0, \"cp_1\": 0, \"cp_2\": 0, \"cp_3\": 0, \"cp_4\": 1, \"dig\": 0, \"diuretic\": 0, \"exang\": 1, \"famhist\": -9, \"fbs\": 1, \"htn\": 1, \"met\": 5, \"nitr\": 0, \"old_peak\": 1, \"painexer\": 1, \"painloc\": 1, \"pro\": 0, \"prop\": 0, \"relrest\": 1, \"restecg_0.0\": 1, \"restecg_1.0\": 0, \"restecg_2.0\": 0, \"rldv5\": 4, \"rldv5e\": 3, \"sex\": 1, \"slope\": 2, \"thalach\": 102, \"thaldur\": 18, \"thalrest\": 57, \"tpeakbpd\": 131, \"tpeakbps\": 188, \"trestbpd\": 53, \"trestbps\": 167, \"xhypo\": 0, \"years\": 20.0, \"risk_level\": \"Low\", \"risk_factor\": 1}"
+
                         String data = dbupdates.poll();
+                        System.out.println(data);
                         data = data.replaceAll("\\{", "");
                         data = data.replaceAll("}", "");
                         data = data.replaceAll("\"", "");

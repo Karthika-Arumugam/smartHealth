@@ -179,18 +179,8 @@ userSchema.statics.updateProfile = async (req) => {
       return patient;
     }
 
-    var set = {
-      'emailId': req.emailId,
-      'firstName': req.firstName,
-      'lastName': req.lastName,
-      'age': req.age,
-      'gender': req.gender,
-      'phone': req.phone,
-      'smokingyears':req.smokingyears,
-       'cigperday' : req.cigperday
-    }
 
-    patient.set(set);
+    patient.set(req);
     const patient2 = await patient.save();
 
     console.log("patient saved")

@@ -216,6 +216,7 @@ class HealthCareDashboard extends Component {
                     }
                     this.setState({ message: response.status === 200 ? 'Success' : body.message });
                     //count the resources allocated each day
+                    console.log(this.state.resources)
                     this.getResourceCount();
 
                 }
@@ -340,10 +341,9 @@ class HealthCareDashboard extends Component {
         const getTableEntries = () => {
             const xx = [];
             for (let [index, key] of this.state.resources.entries()) {
-
                 if (index < 10) {
                     const datealloc = new Date(key.lastUpdatedAt)
-                    const dateString = datealloc.toLocaleDateString()
+                    let dateString = new Intl.DateTimeFormat(['ban', 'id']).format(datealloc)
                     xx.push(
                         <tr>
                             <td>{key.resourceType}</td>

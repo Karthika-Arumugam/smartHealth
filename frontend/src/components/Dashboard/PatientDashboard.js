@@ -57,9 +57,12 @@ class PatientDashboard extends Component {
                             heartRateData.push([body.time[index] ? new Date(body.time[index]).getTime() : new Date().getTime(), body.heartRates[index] || prevHeartRate]);
                             prevHeartRate = body.heartRates[index] || prevHeartRate;
                             riskStatusData.push([new Date(body.time[index]).getTime(), body.riskStatus[index]]);
-                            body.riskStatus[index] > 2 ? highRiskCount++ : lowRiskcount++;
+                            Number(body.riskStatus[index]) > 2 ? highRiskCount++ : lowRiskcount++;
                         }
+
                         const total = highRiskCount + lowRiskcount;
+                        console.log("high", highRiskCount);
+                        console.log(lowRiskcount);
                         this.setState({
                             stats4Risk: riskStatusData,
                             heartRate: heartRateData,

@@ -27,8 +27,7 @@ router.post('/signup', async (req, res) => {
         currRiskStatus: 0,
         smokingyears: req.body.smokingyears,
         cigperday: req.body.cigperday,
-        healthcareProvider: req.body.healthCareProvider,
-        time: new Date()
+        healthcareProvider: req.body.healthCareProvider
       });
 
       await patient.save();

@@ -264,7 +264,7 @@ simulatedDataSchema.pre("save", async function (next) {
 
 simulatedDataSchema.statics.getHeartrate = async (emailId) => {
   // get heartbeat data details  by email 
-  const data = await  SimulatedData.find({ emailId },{  risk_factor : 1,  trestbps : 1}).sort({ time : -1}).limit(20);
+  const data = await  SimulatedData.find({ emailId },{  risk_factor : 1,  trestbps : 1}).sort({ time : -1})
   
   if (!data) {
     throw new Error({ error: "Invalid Details" });

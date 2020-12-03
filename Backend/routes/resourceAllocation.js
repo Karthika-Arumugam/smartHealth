@@ -29,45 +29,35 @@ router.post('/allocate', async (req, res) => {
       }
 
       try {
+
        resource= await Resource.decrement(req.body);
 
+       console.log("geting patient details for" + req.body.emailId)
+
        let patient;
+       patient = await Patient.getDashboard(req.body.emailId);
+       var set;
 
-       console.log(req.body.emailId)
-       console.log(req.body.resourceType)
+       if(req.body.resourceType === "Medical Prescription" ) {
+       set = {
+        emailId : req.body.emailId,
+        medications : [...patient.medications,req.body.resourceType]
+       }
+      }
+      if(req.body.resourceType === "Cardiologist" ) {
+        set = {
+          emailId : req.body.emailId,
+          allocatedSpecialists : [...patient.allocatedSpecialists,req.body.resourceType]
+         }
+      }
 
-      //  if(req.body.resourceType === "Medical Prescription") {
-
-      //  patient = await Patient.getDashboard(req.body.emailId);
-      //  var set = {
-      //   emailId : req.body.emailId,
-      //   medications : [...medications,req.body.resourceType]
-      //   }
+      set = {...set, allocatedResources : [...patient.allocatedResources,req.body.resourceType]}
        
-      //  patient.set(set);
-      //  await patient.save();
+       patient.set(set);
+       await patient.save();
+       console.log("medications/doctors updated")
 
-      //  console.log("medications updated")
-
-      //  }
-
-      //  if(req.body.resourceType === "Cardiologist") {
-
-      //   patient = await Patient.getDashboard(req.body.emailId);
-      //   var set = {
-      //    emailId : req.body.emailId,
-      //    allocatedSpecialists : [...allocatedSpecialists,req.body.resourceType]
-      //    }
-        
-      //   patient.set(set);
-      //   await patient.save();
- 
-      //   console.log("Allocated Specialists updated")
-         
-      // }
-
-      //  resource= await ResourceAllocation.update(req);
-      res.json({ message: " resource request updated successfully"});
+      res.json({ message: " resource allocated successfully"});
     
       } catch (error) {
         console.log(error)
@@ -82,11 +72,10 @@ router.post('/deallocate', async (req, res) => {
       // update resource
       let resource;
       try {
+
         resource= await ResourceAllocation.deallocate(req.body);
 
         resource= await Resource.increment(req.body);
-    
-
 
         res.json({ message: "Resource updated successfully"});
       } catch (error) {
@@ -156,10 +145,8 @@ router.post('/deallocate', async (req, res) => {
 
         resources = await ResourceAllocation.allocations(req.body);
 
-        console.log(resources)
 
         resources.forEach(resource => {
-          console.log(resource)
           ResourceAllocation.deallocate(resource);
           Resource.increment(resource);
         });
@@ -180,22 +167,18 @@ router.post('/deallocate', async (req, res) => {
       let resources;
       try {
 
-        console.log(  req.body)
-
+  
         req.body = { ... req.body, status: 'allocated'};
 
         resources = await ResourceAllocation.allocations(req.body);
 
-        console.log(resources)
 
         let result = [];
 
         resources.forEach(resource => {
           result.push(resource.resourceType)
         });
-
-        console.log(result)
-
+        
         res.json(result);
     
       } catch (error) {

@@ -94,30 +94,9 @@ const patientSchema = mongoose.Schema({
 
   allocatedResources : [
     {
-      type : {
-        type : String,
-        required: false
-      },
-
-      allocatedTime : {
-        type : Date,
-        required: false
-      },
-
-      allocatedTill : {
-        type : Date,
-        required: false
-      },
-
-      count : {
-        type : Number,
-        required: false
-      },
-
-      currentStatus : {
-        type : String,
-        required: false
-      }
+      type : String,
+      required: false
+  
     }
   ],
 
@@ -179,20 +158,15 @@ patientSchema.statics.getDashboard = async (emailId) => {
  return patient;
 };
 
-patientSchema.statics.updateRiskStatus = async (emailId,riskStatus) => {
+patientSchema.statics.updateRiskStatus = async (emailId,riskStatus, date) => {
   // get patient dashboard details  by email 
   const patient = await Patient.findOne({ emailId });
 
-  var date = new Date();
-  var utcDate = new Date(date.toUTCString());
-  utcDate.setHours(utcDate.getHours()-8);
-  var usDate = new Date(utcDate);
-  console.log(usDate);
 
   var set = {
     emailId : emailId,
     riskStatus : [...patient.riskStatus,riskStatus],
-    time : [...patient.time,usDate],
+    time : [...patient.time,date],
     currRiskStatus : riskStatus
 }
 

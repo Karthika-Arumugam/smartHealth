@@ -25,62 +25,68 @@ public class ResourceRequestConsumer {
 
     public void consume(String requestData) {
 
-        LOG.info("Allocate resources.");
-        dbupdates.add(requestData);
+        try {
 
-        String  criticality  =  getCriticality(requestData) ;
-      //  String  criticality  =  "normal" ;
-        String timestamp = new Date().toString() ;
-        String patientId = getPatientId(requestData);
+            LOG.info("Allocate resources.");
+            dbupdates.add(requestData);
 
-        System.out.println("Request received for" + patientId);
+            String criticality = getCriticality(requestData);
+            //  String  criticality  =  "normal" ;
+            String timestamp = new Date().toString();
+            String patientId = getPatientId(requestData);
 
-        RiskCalculator riskCalculator = new RiskCalculator();
-        double riskFactor = riskCalculator.assessRiskAndPriority(criticality,timestamp,patientId);
+            System.out.println("Request received for" + patientId);
 
-        System.out.println("risk evaluation  completed" + riskFactor);
+            RiskCalculator riskCalculator = new RiskCalculator();
+            double riskFactor = riskCalculator.assessRiskAndPriority(criticality, timestamp, patientId);
 
-        int prevRiskLevel = resourceInventory.getRiskStatus(patientId);
+            System.out.println("risk evaluation  completed" + riskFactor);
 
-        if(riskFactor == 0 || prevRiskLevel != Math.ceil(riskFactor)){
+            int prevRiskLevel = resourceInventory.getRiskStatus(patientId);
 
-            resourceInventory.deallocateAllResources(patientId,resourceInventory.getHealthcare(patientId));
-            resourceAllocator.deleteAllRequests(patientId);
-        }
+            if (riskFactor == 0 || prevRiskLevel != Math.ceil(riskFactor)) {
 
-       if(riskFactor >  0 ) {
-
-            ResourceEstimator resourceEstimator = new ResourceEstimator();
-            List<String> resourcesNeeded = resourceEstimator.estimateResources(criticality,patientId);
-           System.out.println("resource estimation done" + resourcesNeeded);
-
-           System.out.println("resources needed 1 :" + resourcesNeeded);
-
-            if(resourceAllocator.patientResourceMap.get(patientId) !=null) {
-
-                System.out.println("patient resource map has elements"+resourceAllocator.patientResourceMap.get(patientId) );
-
-                resourcesNeeded.removeAll(resourceAllocator.patientResourceMap.get(patientId));
+                resourceInventory.deallocateAllResources(patientId, resourceInventory.getHealthcare(patientId));
+                resourceAllocator.deleteAllRequests(patientId);
             }
 
-           System.out.println("resources needed 2 :" + resourcesNeeded);
+            if (riskFactor > 0) {
 
-            resourceInventory.removeAllocatedResources(resourcesNeeded,patientId,resourceInventory.getHealthcare(patientId));
+                ResourceEstimator resourceEstimator = new ResourceEstimator();
+                List<String> resourcesNeeded = resourceEstimator.estimateResources(criticality, patientId);
+                System.out.println("resource estimation done" + resourcesNeeded);
 
-           System.out.println("resources needed 3 :" + resourcesNeeded);
-           if(resourcesNeeded.isEmpty())
-               return;
+                System.out.println("resources needed 1 :" + resourcesNeeded);
 
-           Request request = new Request(patientId,"queued");
-           request.setReceivedAt(new Date());
-           request.setHealthCareProvider(resourceInventory.getHealthcare(patientId));
-           request.setHealthRisk(criticality);
-           resourceInventory.addRequestStatistics(request);
+                if (resourceAllocator.patientResourceMap.get(patientId) != null) {
 
-            for(String  resource : resourcesNeeded)
-               resourceInventory.createResourceAllocationStatus(request,"received",resource);
+                    System.out.println("patient resource map has elements" + resourceAllocator.patientResourceMap.get(patientId));
 
-            resourceAllocator.allocateResources(riskFactor,resourcesNeeded,patientId,request);
+                    resourcesNeeded.removeAll(resourceAllocator.patientResourceMap.get(patientId));
+                }
+
+                System.out.println("resources needed 2 :" + resourcesNeeded);
+
+                resourceInventory.removeAllocatedResources(resourcesNeeded, patientId, resourceInventory.getHealthcare(patientId));
+
+                System.out.println("resources needed 3 :" + resourcesNeeded);
+                if (resourcesNeeded.isEmpty())
+                    return;
+
+                Request request = new Request(patientId, "queued");
+                request.setReceivedAt(new Date());
+                request.setHealthCareProvider(resourceInventory.getHealthcare(patientId));
+                request.setHealthRisk(criticality);
+                resourceInventory.addRequestStatistics(request);
+
+                for (String resource : resourcesNeeded)
+                    resourceInventory.createResourceAllocationStatus(request, "received", resource);
+
+                resourceAllocator.allocateResources(riskFactor, resourcesNeeded, patientId, request);
+            }
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -116,6 +122,10 @@ public class ResourceRequestConsumer {
         for(int i = 0 ; i < dataMap.length ; i++) {
             String key = dataMap[i].split(":")[0].trim();
 
+            if(key.equals("emailId") && dataMap[i].split(":")[1].trim().equals("shelly@gmail.com")) {
+                return "Medium";
+            }
+
             if(key.equals("risk_level"))
                 return dataMap[i].split(":")[1].trim();
 
@@ -129,7 +139,7 @@ public class ResourceRequestConsumer {
 
             while (true) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                     LOG.info("Inner Thread for updating mongo db");
 
                     if(!dbupdates.isEmpty()) {
@@ -170,6 +180,11 @@ public class ResourceRequestConsumer {
                         }
 
                         simulatedData.put("time", new Date());
+
+                        if(simulatedData.get("emailId").equals("shelly@gmail.com")) {
+                            simulatedData.put("risk_level", "Medium");
+                            simulatedData.put("risk_factor", 2);
+                        }
 
                         String statisticResultAsJsonStr =
                                 restTemplate.postForObject(updateDataUrl, simulatedData, String.class);

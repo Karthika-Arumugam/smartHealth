@@ -139,7 +139,7 @@ public class ResourceRequestConsumer {
 
             while (true) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                     LOG.info("Inner Thread for updating mongo db");
 
                     if(!dbupdates.isEmpty()) {

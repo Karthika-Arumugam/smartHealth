@@ -120,16 +120,29 @@ resourceAllocationSchema.statics.getAll = async (req) => {
   let data;
 
   if(req.query.healthcareProvider) {
-     data = await ResourceAllocation.find({'healthcareProvider' : req.query.healthcareProvider}).sort( { lastUpdatedAt : -1 } ).limit(30)
+     data = await ResourceAllocation.find({'healthcareProvider' : req.query.healthcareProvider}).sort( { lastUpdatedAt : -1 } ).limit(40)
   }
   else {
-    data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } ).limit(30)
+    data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } ).limit(40);
   }
 
   if (!data) {
     throw new Error({ error: "Couldn't get resource allocation details" });
   }
-  return data;
+
+  let filteredData = []
+  let ambulancePatients = []
+
+  data.forEach(element => {
+    if(element.resourceType !== 'Ambulance' || !ambulancePatients.includes(element.patient)) {
+
+      if(element.resourceType === 'Ambulance') {
+          ambulancePatients.push(element.patient);
+      }
+      filteredData.push(element)
+    }
+  });
+  return filteredData;
 };
 
 

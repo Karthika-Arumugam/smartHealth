@@ -307,8 +307,7 @@ class Resource extends Component {
                                             <span className="time"><img src="/images/tag.png" alt="Available" />Available {ob.available}</span>
                                             {this.state.userGroup === "Admin" ?
                                                 (<span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" onChange={this.changeQuantity(index)} min={ob.available} defaultValue={ob.quantity} />
-                                                </span>) : (<span className="time"><input style={{ width: "100px", marginLeft: "10px" }} type="number" defaultValue={ob.quantity} readOnly />
-                                                </span>)}
+                                                </span>) : null}
                                             {this.state.userGroup === "Admin" ?
                                                 (<span>
                                                     <span className="contact-form" >

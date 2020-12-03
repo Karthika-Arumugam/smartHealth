@@ -233,7 +233,7 @@ class ActivePatientDetails extends Component {
                 }]
             },
             tooltip: {
-                valueSuffix: '%'
+                valueSuffix: 'Risk Factor'
             },
             plotOptions: {
                 spline: {
@@ -251,7 +251,7 @@ class ActivePatientDetails extends Component {
                 }
             },
             series: [{
-                name: 'Health Risk %',
+                name: 'Health Risk',
                 data: this.state.stats4Risk,
             }],
             navigation: {

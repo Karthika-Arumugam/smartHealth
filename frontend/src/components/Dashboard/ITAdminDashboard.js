@@ -29,8 +29,10 @@ class ITAdminDashboard extends Component {
         const ambulance = {}, prescription = {}, monitoring = {}, cardiologist = {}, equipment = {};
         //create recource type obj as {10/10/2020:3,10/11/2020:4} date:count
         for (let key of this.state.resources) {
-            const datealloc = new Date(key.lastUpdatedAt)
-            const dateString = datealloc.toLocaleDateString()
+            let datealloc = new Date(key.lastUpdatedAt)
+            // const dateString = datealloc.toLocaleDateString()
+            // const datealloc = new Date(key.lastUpdatedAt)
+            let dateString = new Intl.DateTimeFormat().format(datealloc)
             switch (key.resourceType) {
                 case ('Ambulance'):
                     ambulance[dateString] = ambulance[dateString] ? ambulance[dateString] + 1 : 1;
@@ -79,7 +81,7 @@ class ITAdminDashboard extends Component {
 
 
         //4. monitoring Chart Data
-        const monitoringData = [];
+        let monitoringData = [];
         for (let key in monitoring) {
             let d = new Date(key);
             monitoringData.push([Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()), monitoring[key]]);
@@ -611,7 +613,7 @@ class ITAdminDashboard extends Component {
         const getTableEntries = () => {
             const xx = [];
             for (let [index, key] of this.state.resources.entries()) {
-                console.log(typeof (index));
+
                 if (index < 10) {
                     const datealloc = new Date(key.lastUpdatedAt)
                     let dateString = new Intl.DateTimeFormat(['ban', 'id']).format(datealloc)

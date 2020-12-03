@@ -32,7 +32,8 @@ class HealthCareDashboard extends Component {
         //create recource type obj as {10/10/2020:3,10/11/2020:4} date:count
         for (let key of this.state.resources) {
             const datealloc = new Date(key.lastUpdatedAt)
-            const dateString = datealloc.toLocaleDateString()
+            // const dateString = datealloc.toLocaleDateString()
+            let dateString = new Intl.DateTimeFormat().format(datealloc)
             switch (key.resourceType) {
                 case ('Ambulance'):
                     ambulance[dateString] = ambulance[dateString] ? ambulance[dateString] + 1 : 1;

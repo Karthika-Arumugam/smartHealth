@@ -32,19 +32,21 @@ router.post('/allocate', async (req, res) => {
 
        resource= await Resource.decrement(req.body);
 
+       console.log("geting patient details for" + req.body.emailId)
+
        let patient;
-       patient = await Patient.getDashboard(req.body.patient);
+       patient = await Patient.getDashboard(req.body.emailId);
        var set;
 
        if(req.body.resourceType === "Medical Prescription" ) {
        set = {
-        emailId : req.body.patient,
+        emailId : req.body.emailId,
         medications : [...patient.medications,req.body.resourceType]
        }
       }
       if(req.body.resourceType === "Cardiologist" ) {
         set = {
-          emailId : req.body.patient,
+          emailId : req.body.emailId,
           allocatedSpecialists : [...patient.allocatedSpecialists,req.body.resourceType]
          }
       }
@@ -70,11 +72,10 @@ router.post('/deallocate', async (req, res) => {
       // update resource
       let resource;
       try {
+
         resource= await ResourceAllocation.deallocate(req.body);
 
         resource= await Resource.increment(req.body);
-    
-
 
         res.json({ message: "Resource updated successfully"});
       } catch (error) {
@@ -144,10 +145,8 @@ router.post('/deallocate', async (req, res) => {
 
         resources = await ResourceAllocation.allocations(req.body);
 
-        console.log(resources)
 
         resources.forEach(resource => {
-          console.log(resource)
           ResourceAllocation.deallocate(resource);
           Resource.increment(resource);
         });
@@ -168,22 +167,18 @@ router.post('/deallocate', async (req, res) => {
       let resources;
       try {
 
-        console.log(  req.body)
-
+  
         req.body = { ... req.body, status: 'allocated'};
 
         resources = await ResourceAllocation.allocations(req.body);
 
-        console.log(resources)
 
         let result = [];
 
         resources.forEach(resource => {
           result.push(resource.resourceType)
         });
-
-        console.log(result)
-
+        
         res.json(result);
     
       } catch (error) {

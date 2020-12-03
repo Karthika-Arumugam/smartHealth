@@ -148,9 +148,6 @@ resourceAllocationSchema.statics.getAll = async (req) => {
 
 resourceAllocationSchema.statics.allocations = async (req) => {
 
-  console.log(req.healthcareProvider)
-
-  console.log(req.patient)
 
   let data = await ResourceAllocation.find(req);
   if (!data) {

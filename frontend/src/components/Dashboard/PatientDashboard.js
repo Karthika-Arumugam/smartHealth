@@ -305,7 +305,7 @@ class PatientDashboard extends Component {
                 }]
             },
             tooltip: {
-                valueSuffix: '%'
+                valueSuffix: ' Risk Factor'
             },
             plotOptions: {
                 spline: {
@@ -323,7 +323,7 @@ class PatientDashboard extends Component {
                 }
             },
             series: [{
-                name: 'Health Risk %',
+                name: 'Health Risk',
                 data: this.state.stats4Risk,
             }],
             navigation: {
@@ -515,8 +515,8 @@ class PatientDashboard extends Component {
                                     </Badge>
                                 </h1>
                             </Col>
-                            <Col><h1><Badge variant="warning">My Doctors<br></br>{this.state.docCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
-                            <Col><h1><Badge variant="info">Medication<br></br>{this.state.medCount}<br></br><br></br><h6><a>more info</a></h6></Badge></h1></Col>
+                            <Col><h1><Badge variant="warning">My Doctors<br></br><br></br>{this.state.docCount}<br></br><br></br><h6></h6></Badge></h1></Col>
+                            <Col><h1><Badge variant="info">Medication<br></br><br></br>{this.state.medCount}<br></br><br></br><h6></h6></Badge></h1></Col>
                             <Col><h1><Badge variant={this.state.currRiskStatus > 2 ? "warning" : "success"}>Risk Status<br></br><br></br>{this.state.currRiskString}<br></br><br></br><h6><a></a></h6></Badge></h1></Col>
                         </Row>
                     </Row>

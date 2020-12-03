@@ -94,30 +94,9 @@ const patientSchema = mongoose.Schema({
 
   allocatedResources : [
     {
-      type : {
-        type : String,
-        required: false
-      },
-
-      allocatedTime : {
-        type : Date,
-        required: false
-      },
-
-      allocatedTill : {
-        type : Date,
-        required: false
-      },
-
-      count : {
-        type : Number,
-        required: false
-      },
-
-      currentStatus : {
-        type : String,
-        required: false
-      }
+      type : String,
+      required: false
+  
     }
   ],
 

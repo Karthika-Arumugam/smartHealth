@@ -29,45 +29,33 @@ router.post('/allocate', async (req, res) => {
       }
 
       try {
+
        resource= await Resource.decrement(req.body);
 
        let patient;
+       patient = await Patient.getDashboard(req.body.patient);
+       var set;
 
-       console.log(req.body.emailId)
-       console.log(req.body.resourceType)
+       if(req.body.resourceType === "Medical Prescription" ) {
+       set = {
+        emailId : req.body.patient,
+        medications : [...patient.medications,req.body.resourceType]
+       }
+      }
+      if(req.body.resourceType === "Cardiologist" ) {
+        set = {
+          emailId : req.body.patient,
+          allocatedSpecialists : [...patient.allocatedSpecialists,req.body.resourceType]
+         }
+      }
 
-      //  if(req.body.resourceType === "Medical Prescription") {
-
-      //  patient = await Patient.getDashboard(req.body.emailId);
-      //  var set = {
-      //   emailId : req.body.emailId,
-      //   medications : [...medications,req.body.resourceType]
-      //   }
+      set = {...set, allocatedResources : [...patient.allocatedResources,req.body.resourceType]}
        
-      //  patient.set(set);
-      //  await patient.save();
+       patient.set(set);
+       await patient.save();
+       console.log("medications/doctors updated")
 
-      //  console.log("medications updated")
-
-      //  }
-
-      //  if(req.body.resourceType === "Cardiologist") {
-
-      //   patient = await Patient.getDashboard(req.body.emailId);
-      //   var set = {
-      //    emailId : req.body.emailId,
-      //    allocatedSpecialists : [...allocatedSpecialists,req.body.resourceType]
-      //    }
-        
-      //   patient.set(set);
-      //   await patient.save();
- 
-      //   console.log("Allocated Specialists updated")
-         
-      // }
-
-      //  resource= await ResourceAllocation.update(req);
-      res.json({ message: " resource request updated successfully"});
+      res.json({ message: " resource allocated successfully"});
     
       } catch (error) {
         console.log(error)

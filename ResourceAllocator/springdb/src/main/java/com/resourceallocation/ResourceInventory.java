@@ -224,6 +224,7 @@ public class ResourceInventory {
         JSONObject deallocationRequest = new JSONObject();
         deallocationRequest.put("patient",patientId );
         deallocationRequest.put("healthcareProvider", healthcare);
+        deallocationRequest.put("status", "allocated");
 
         HttpEntity requestEntity = new HttpEntity(deallocationRequest, requestHeaders);
         ResponseEntity response = restTemplate.exchange(resourcedeAllocation, HttpMethod.POST, requestEntity, String.class);
@@ -264,6 +265,7 @@ public class ResourceInventory {
         JSONObject allocationRequest = new JSONObject();
         allocationRequest.put("patient",patientId );
         allocationRequest.put("healthcareProvider", healthcare);
+        allocationRequest.put("status", "allocated");
 
         HttpEntity requestEntity = new HttpEntity(allocationRequest, requestHeaders);
        // ResponseEntity response = restTemplate.exchange(getAllocations, HttpMethod.POST, requestEntity, ArrayList.class);

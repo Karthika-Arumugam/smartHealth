@@ -42,9 +42,11 @@ class Resource extends Component {
     }
     changeQuantity = (index) => async e => {
         const newQty = parseInt(e.target.value);
+        const delta = newQty - this.state.healthcarelist[index].quantity;
         const newHealthcareList = JSON.parse(JSON.stringify(this.state.healthcarelist));
         newHealthcareList[index].totalCount = newQty;
         newHealthcareList[index].quantity = newQty;
+        newHealthcareList[index].available += delta;
         this.setState({ healthcarelist: newHealthcareList });
     }
     deleteHandler = (resourceObj) => async e => {

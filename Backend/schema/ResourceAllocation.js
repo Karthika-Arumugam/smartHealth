@@ -120,10 +120,10 @@ resourceAllocationSchema.statics.getAll = async (req) => {
   let data;
 
   if(req.query.healthcareProvider) {
-     data = await ResourceAllocation.find({'healthcareProvider' : req.query.healthcareProvider}).sort( { lastUpdatedAt : -1 } ).limit(40)
+     data = await ResourceAllocation.find({'healthcareProvider' : req.query.healthcareProvider}).sort( { lastUpdatedAt : -1 } )
   }
   else {
-    data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } ).limit(40);
+    data = await ResourceAllocation.find().sort( { lastUpdatedAt : -1 } );
   }
 
   if (!data) {

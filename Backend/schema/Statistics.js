@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const SLAResponseTime = 900;
+const SLAResponseTime = 1800;
 
 
 const statisticsSchema = mongoose.Schema({

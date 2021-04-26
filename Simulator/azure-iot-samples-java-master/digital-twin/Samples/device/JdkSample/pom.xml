@@ -40,7 +40,7 @@
         <maven-jar-plugin-version>3.1.0</maven-jar-plugin-version>
         <build-helper-version>3.0.0</build-helper-version>
         <slf4j-version>1.7.25</slf4j-version>
-        <commons-io-version>2.6</commons-io-version>
+        <commons-io-version>2.7</commons-io-version>
         <project-device-samples-version>1.0.0</project-device-samples-version>
         <provisioning-device-client-version>LATEST</provisioning-device-client-version>
 		<digital-twin-device-client-version>LATEST</digital-twin-device-client-version>
